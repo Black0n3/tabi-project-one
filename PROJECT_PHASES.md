@@ -56,14 +56,16 @@ Poligon (hotspot) zona živi na "djetetu" i referencira sliku "roditelja":
 - [x] PHPUnit test runner radi (`php artisan test` — 26/26 testova prolazi)
 - [x] Osnovni `README.md` s uputama za pokretanje projekta
 
-## Faza 1 — Autentikacija i role ⬜
+## Faza 1 — Autentikacija i role ✅
 
-- [ ] `users` tablica: dodan `role` enum (`admin`, `investor`)
-- [ ] Middleware/Gate za razlikovanje `/admin` i `/investitor` ruta
-- [ ] Layout za `/admin` panel (sidebar, navigacija)
-- [ ] Layout za `/investitor` panel (sidebar, navigacija)
-- [ ] Seeder za super-admin korisnika
-- [ ] Investitor se NE može self-registrirati — nalog kreira isključivo admin
+- [x] `users` tablica: dodan `role` enum (`admin`, `investor`) — `App\Enums\UserRole`
+- [x] Middleware/Gate za razlikovanje `/admin` i `/investitor` ruta — `role:admin` / `role:investor` middleware
+- [x] Layout za `/admin` panel (sidebar, navigacija) — `layouts.admin` + `x-admin-layout`
+- [x] Layout za `/investitor` panel (sidebar, navigacija) — `layouts.investor` + `x-investor-layout`
+- [x] Seeder za super-admin korisnika (+ demo investitor za testiranje) —
+  `admin@tabi.hr` / `investitor@tabi.hr`, lozinka `password`
+- [x] Investitor se NE može self-registrirati — ruta `/register` uklonjena,
+  nalog kreira isključivo admin (seeder sad, admin CRUD u Fazi 3)
 
 ## Faza 2 — Data model (migracije + modeli) ⬜
 
@@ -128,12 +130,12 @@ Poligon (hotspot) zona živi na "djetetu" i referencira sliku "roditelja":
 
 ## Status
 
-**Trenutna faza:** Faza 0 gotova. Sljedeća: Faza 1 — Autentikacija i role.
+**Trenutna faza:** Faza 1 gotova. Sljedeća: Faza 2 — Data model.
 
 | Faza | Status |
 |---|---|
 | 0 — Bootstrap | ✅ |
-| 1 — Auth i role | ⬜ |
+| 1 — Auth i role | ✅ |
 | 2 — Data model | ⬜ |
 | 3 — Admin panel | ⬜ |
 | 4 — Investitor panel | ⬜ |

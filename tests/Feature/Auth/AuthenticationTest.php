@@ -60,11 +60,29 @@ class AuthenticationTest extends TestCase
 
         $this->actingAs($user);
 
-        $response = $this->get('/dashboard');
+        $response = $this->get('/profile');
 
         $response
             ->assertOk()
             ->assertSeeVolt('layout.navigation');
+    }
+
+    public function test_dashboard_redirects_admin_to_admin_panel(): void
+    {
+        $user = User::factory()->admin()->create();
+
+        $response = $this->actingAs($user)->get('/dashboard');
+
+        $response->assertRedirect(route('admin.dashboard'));
+    }
+
+    public function test_dashboard_redirects_investor_to_investor_panel(): void
+    {
+        $user = User::factory()->investor()->create();
+
+        $response = $this->actingAs($user)->get('/dashboard');
+
+        $response->assertRedirect(route('investitor.dashboard'));
     }
 
     public function test_users_can_logout(): void
