@@ -33,11 +33,10 @@
                         </a>
 
                         <div class="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700 space-y-1">
-                            <p class="px-3 text-xs font-semibold uppercase text-gray-400 dark:text-gray-500">{{ __('Uskoro') }}</p>
-                            <span class="block rounded-md px-3 py-2 text-sm text-gray-400 dark:text-gray-600 cursor-not-allowed">{{ __('Investitori') }}</span>
-                            <span class="block rounded-md px-3 py-2 text-sm text-gray-400 dark:text-gray-600 cursor-not-allowed">{{ __('Projekti') }}</span>
-                            <span class="block rounded-md px-3 py-2 text-sm text-gray-400 dark:text-gray-600 cursor-not-allowed">{{ __('Objekti') }}</span>
-                            <span class="block rounded-md px-3 py-2 text-sm text-gray-400 dark:text-gray-600 cursor-not-allowed">{{ __('Jedinice') }}</span>
+                            <a href="{{ route('admin.investors.index') }}" wire:navigate
+                                class="block rounded-md px-3 py-2 text-sm font-medium {{ request()->routeIs('admin.investors.*') ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800' }}">
+                                {{ __('Investitori') }}
+                            </a>
                         </div>
                     </nav>
                 </aside>

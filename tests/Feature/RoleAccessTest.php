@@ -62,4 +62,13 @@ class RoleAccessTest extends TestCase
     {
         $this->get('/register')->assertNotFound();
     }
+
+    public function test_investor_cannot_access_admin_investors_crud(): void
+    {
+        $investor = User::factory()->investor()->create();
+
+        $this->actingAs($investor)
+            ->get('/admin/investitori')
+            ->assertForbidden();
+    }
 }

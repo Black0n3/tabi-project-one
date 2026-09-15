@@ -82,13 +82,19 @@ Poligon (hotspot) zona živi na "djetetu" i referencira sliku "roditelja":
   s demo podacima za razvoj (`DemoDataSeeder` — Sunčani Vrt d.o.o. → Rezidencija
   Sunčani Vrt → Zgrada A → 3 kata → 3 jedinice → prostorije)
 
-## Faza 3 — Globalni admin panel (CRUD) ⬜
+## Faza 3 — Globalni admin panel (CRUD) ✅
 
-- [ ] CRUD: Investitori (kreiranje naloga investitora od strane admina)
-- [ ] CRUD: Projekti, Objekti, Jedinice, Prostorije — admin može upravljati
-  podacima BILO KOJEG investitora
-- [ ] Upload slika (fasada, tlocrti) s validacijom i optimizacijom
-- [ ] Pregled/pretraga/filter liste u panelu
+- [x] CRUD: Investitori (kreiranje naloga investitora od strane admina —
+  kreira i `User` login i `Investor` profil u istom obrascu)
+- [x] CRUD: Projekti, Objekti, Jedinice, Prostorije — admin može upravljati
+  podacima BILO KOJEG investitora, kroz kontekstualnu navigaciju
+  Investitor → Projekt → Objekat → (Kat/Jedinica) → Prostorija
+- [x] Upload slika (logo investitora, cover projekta, fasada objekta,
+  tlocrt kata, tlocrt jedinice) s validacijom (`image`, max veličina),
+  spremaju se na `public` disk
+- [x] Pregled/pretraga liste investitora (search + paginacija); ostali nivoi
+  hijerarhije pregledavaju se kroz "show" stranice roditelja (bez posebnog
+  globalnog popisa — navigacija je kontekstualna)
 
 ## Faza 4 — Investitor panel (CRUD) ⬜
 
@@ -131,14 +137,14 @@ Poligon (hotspot) zona živi na "djetetu" i referencira sliku "roditelja":
 
 ## Status
 
-**Trenutna faza:** Faza 2 gotova. Sljedeća: Faza 3 — Globalni admin panel (CRUD).
+**Trenutna faza:** Faza 3 gotova. Sljedeća: Faza 4 — Investitor panel (CRUD).
 
 | Faza | Status |
 |---|---|
 | 0 — Bootstrap | ✅ |
 | 1 — Auth i role | ✅ |
 | 2 — Data model | ✅ |
-| 3 — Admin panel | ⬜ |
+| 3 — Admin panel | ✅ |
 | 4 — Investitor panel | ⬜ |
 | 5 — Poligon editor | ⬜ |
 | 6 — Javni frontend | ⬜ |
