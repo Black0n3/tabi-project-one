@@ -1,75 +1,86 @@
 <div>
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">
+    <x-page-hero>
+        <p class="text-sm text-emerald-300/90 mb-3">
             <a href="{{ route('public.projects.show', $unit->building->project) }}" wire:navigate class="hover:underline">{{ $unit->building->project->name }}</a>
-            /
+            <span class="text-emerald-300/50">/</span>
             <a href="{{ route('public.buildings.show', $unit->building) }}" wire:navigate class="hover:underline">{{ $unit->building->name }}</a>
         </p>
 
         <div class="flex flex-wrap items-center gap-3">
-            <h1 class="text-2xl sm:text-3xl font-bold">{{ __('Jedinica') }} {{ $unit->code }}</h1>
+            <h1 class="font-display text-3xl sm:text-5xl font-semibold leading-tight">{{ __('Jedinica') }} {{ $unit->code }}</h1>
             <x-unit-status-badge :status="$unit->status" />
         </div>
 
-        <p class="text-gray-500 dark:text-gray-400 mt-2">
-            {{ $unit->type->label() }} &middot; {{ $unit->area_m2 }} m²
-            @if ($unit->floor) &middot; {{ $unit->floor->label }} @endif
-            @if ($unit->price) &middot; {{ number_format((float) $unit->price, 0, ',', '.') }} € @endif
+        <p class="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-emerald-100/80">
+            <span>{{ $unit->type->label() }}</span>
+            <span class="text-emerald-300/50">&middot;</span>
+            <span>{{ $unit->area_m2 }} m²</span>
+            @if ($unit->floor)
+                <span class="text-emerald-300/50">&middot;</span>
+                <span>{{ $unit->floor->label }}</span>
+            @endif
+            @if ($unit->price)
+                <span class="text-emerald-300/50">&middot;</span>
+                <span class="font-display text-lg font-semibold text-white">{{ number_format((float) $unit->price, 0, ',', '.') }} €</span>
+            @endif
         </p>
+    </x-page-hero>
 
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16">
         @if ($unit->description)
-            <p class="mt-6 max-w-2xl text-gray-700 dark:text-gray-300">{{ $unit->description }}</p>
+            <p class="max-w-2xl text-stone-600 dark:text-stone-400 leading-relaxed mb-14">{{ $unit->description }}</p>
         @endif
-    </div>
 
-    <div
-        class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16"
-        x-data="unitPlanViewer({ rooms: @js($roomsData) })"
-        x-init="init()"
-    >
-        <h2 class="text-lg font-semibold mb-6">{{ __('Tlocrt') }}</h2>
+        <div
+            x-data="unitPlanViewer({ rooms: @js($roomsData) })"
+            x-init="init()"
+        >
+            <p class="text-xs font-semibold uppercase tracking-widest text-emerald-800 dark:text-emerald-400 mb-2">{{ __('Raspored prostorija') }}</p>
+            <h2 class="font-display text-2xl sm:text-3xl font-semibold mb-8">{{ __('Tlocrt') }}</h2>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-            <div class="lg:col-span-2 relative inline-block border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-900 w-full">
-                @if ($planUrl)
-                    <img x-ref="image" src="{{ $planUrl }}" @load="updateRect" class="block w-full h-auto select-none" draggable="false" alt="{{ __('Tlocrt jedinice') }} {{ $unit->code }}">
-                    <svg
-                        x-ref="svg"
-                        x-html="renderSvg()"
-                        class="absolute inset-0 w-full h-full"
-                        @mousemove="onMove($event)"
-                        @mouseleave="hoveredId = null"
-                        @click="onClick($event)"
-                        style="cursor: pointer;"
-                    ></svg>
-                @else
-                    <div class="aspect-[4/3] flex items-center justify-center text-gray-400 dark:text-gray-600 text-sm p-8 text-center">
-                        {{ __('Tlocrt jedinice još nije dodan.') }}
-                    </div>
-                @endif
-            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                <div class="lg:col-span-2 relative inline-block rounded-2xl border border-stone-200 dark:border-stone-800 shadow-sm overflow-hidden bg-stone-100 dark:bg-stone-900 w-full">
+                    @if ($planUrl)
+                        <img x-ref="image" src="{{ $planUrl }}" @load="updateRect" class="block w-full h-auto select-none" draggable="false" alt="{{ __('Tlocrt jedinice') }} {{ $unit->code }}">
+                        <svg
+                            x-ref="svg"
+                            x-html="renderSvg()"
+                            class="absolute inset-0 w-full h-full"
+                            @mousemove="onMove($event)"
+                            @mouseleave="hoveredId = null"
+                            @click="onClick($event)"
+                            style="cursor: pointer;"
+                        ></svg>
+                    @else
+                        <div class="aspect-[4/3] flex flex-col items-center justify-center gap-3 text-stone-400 dark:text-stone-600 text-sm p-8 text-center">
+                            <x-building-placeholder-icon class="h-10 w-10" />
+                            {{ __('Tlocrt jedinice još nije dodan.') }}
+                        </div>
+                    @endif
+                </div>
 
-            <div>
-                <template x-if="rooms.length > 0">
-                    <ul class="space-y-1">
-                        <template x-for="room in rooms" :key="room.id">
-                            <li
-                                @mouseenter="hoveredId = room.id"
-                                @mouseleave="hoveredId = null"
-                                @click="hoveredId = room.id"
-                                class="flex items-center justify-between gap-3 rounded-md px-3 py-2 text-sm cursor-pointer transition"
-                                :class="hoveredId === room.id ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-900 dark:text-indigo-200' : 'hover:bg-gray-50 dark:hover:bg-gray-800'"
-                            >
-                                <span x-text="room.label"></span>
-                                <span class="text-gray-500 dark:text-gray-400" x-text="room.area ? room.area + ' m²' : ''"></span>
-                            </li>
-                        </template>
-                    </ul>
-                </template>
+                <div>
+                    <template x-if="rooms.length > 0">
+                        <ul class="space-y-1">
+                            <template x-for="room in rooms" :key="room.id">
+                                <li
+                                    @mouseenter="hoveredId = room.id"
+                                    @mouseleave="hoveredId = null"
+                                    @click="hoveredId = room.id"
+                                    class="flex items-center justify-between gap-3 rounded-lg px-3.5 py-2.5 text-sm cursor-pointer transition"
+                                    :class="hoveredId === room.id ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-900 dark:text-emerald-200' : 'hover:bg-stone-100 dark:hover:bg-stone-800'"
+                                >
+                                    <span x-text="room.label" class="font-medium"></span>
+                                    <span class="text-stone-500 dark:text-stone-400" x-text="room.area ? room.area + ' m²' : ''"></span>
+                                </li>
+                            </template>
+                        </ul>
+                    </template>
 
-                <template x-if="rooms.length === 0">
-                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Detaljan raspored prostorija još nije unesen.') }}</p>
-                </template>
+                    <template x-if="rooms.length === 0">
+                        <p class="text-sm text-stone-500 dark:text-stone-400">{{ __('Detaljan raspored prostorija još nije unesen.') }}</p>
+                    </template>
+                </div>
             </div>
         </div>
     </div>
@@ -154,13 +165,13 @@
                             if (!this.hasShape(room.points)) continue;
                             const active = room.id === this.hoveredId;
                             html += `<polygon points="${this.toSvgPoints(room.points)}" `
-                                + `class="${active ? 'fill-indigo-500/35 stroke-indigo-600' : 'fill-white/10 stroke-white/70'}" `
+                                + `class="${active ? 'fill-emerald-500/35 stroke-emerald-600' : 'fill-stone-900/5 stroke-stone-900/40 dark:fill-white/10 dark:stroke-white/70'}" `
                                 + `stroke-width="2"></polygon>`;
                             if (active) {
                                 const c = this.toPx(this.centroid(room.points));
                                 const label = room.area ? `${room.label} (${room.area} m²)` : room.label;
                                 html += `<text x="${c[0]}" y="${c[1]}" text-anchor="middle" class="fill-white text-xs font-semibold pointer-events-none" `
-                                    + `style="paint-order: stroke; stroke: rgba(0,0,0,.6); stroke-width: 3px;">${this.escapeHtml(label)}</text>`;
+                                    + `style="paint-order: stroke; stroke: rgba(6,78,59,.85); stroke-width: 3px;">${this.escapeHtml(label)}</text>`;
                             }
                         }
                         return html;

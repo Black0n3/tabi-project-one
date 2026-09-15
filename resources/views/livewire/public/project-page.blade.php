@@ -1,37 +1,37 @@
 <div>
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">{{ $project->investor->company_name }}</p>
-        <h1 class="text-2xl sm:text-3xl font-bold">{{ $project->name }}</h1>
-        <p class="text-gray-500 dark:text-gray-400 mt-1">{{ $project->location }} &middot; {{ $project->status->label() }}</p>
+    <x-page-hero :image="$project->cover_image ? Storage::disk('public')->url($project->cover_image) : null">
+        <p class="text-sm text-emerald-300/90 mb-3">{{ $project->investor->company_name }}</p>
+        <h1 class="font-display text-3xl sm:text-5xl font-semibold leading-tight">{{ $project->name }}</h1>
+        <p class="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-emerald-100/80">
+            @if ($project->location)
+                <span class="inline-flex items-center gap-1.5">
+                    <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4"><path fill-rule="evenodd" d="M9.69 18.933a.75.75 0 00.62 0c.327-.146 8.69-3.99 8.69-9.933a9 9 0 10-18 0c0 5.943 8.363 9.787 8.69 9.933zM10 12.5a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" /></svg>
+                    {{ $project->location }}
+                </span>
+                <span class="text-emerald-300/50">&middot;</span>
+            @endif
+            <span class="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-sm font-medium">{{ $project->status->label() }}</span>
+        </p>
+    </x-page-hero>
 
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16">
         @if ($project->description)
-            <p class="mt-6 max-w-2xl text-gray-700 dark:text-gray-300">{{ $project->description }}</p>
+            <p class="max-w-2xl text-stone-600 dark:text-stone-400 leading-relaxed mb-14">{{ $project->description }}</p>
         @endif
-    </div>
 
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        <h2 class="text-lg font-semibold mb-6">{{ __('Objekti') }}</h2>
+        <div class="flex items-end justify-between mb-8">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-widest text-emerald-800 dark:text-emerald-400 mb-2">{{ __('U ovom projektu') }}</p>
+                <h2 class="font-display text-2xl sm:text-3xl font-semibold">{{ __('Objekti') }}</h2>
+            </div>
+        </div>
 
         @if ($buildings->isEmpty())
-            <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Ovaj projekt još nema objavljenih objekata.') }}</p>
+            <p class="text-sm text-stone-500 dark:text-stone-400">{{ __('Ovaj projekt još nema objavljenih objekata.') }}</p>
         @else
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach ($buildings as $building)
-                    <a href="{{ route('public.buildings.show', $building) }}" wire:navigate class="group block rounded-lg border border-gray-200 dark:border-gray-800 overflow-hidden hover:shadow-md transition">
-                        <div class="aspect-[4/3] bg-gray-100 dark:bg-gray-800 overflow-hidden">
-                            @if ($building->facade_image)
-                                <img src="{{ Storage::disk('public')->url($building->facade_image) }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="{{ $building->name }}">
-                            @else
-                                <div class="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-600 text-sm">{{ __('Bez slike') }}</div>
-                            @endif
-                        </div>
-                        <div class="p-4">
-                            <h3 class="font-medium">{{ $building->name }}</h3>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                {{ $building->type->label() }} &middot; {{ $building->units_count }} {{ __('jedinica') }}
-                            </p>
-                        </div>
-                    </a>
+                    <x-building-card :building="$building" />
                 @endforeach
             </div>
         @endif

@@ -170,7 +170,43 @@ hover/tap detekciju kao u editoru, samo bez mogućnosti crtanja/uređivanja).
   (naslovna, popisi, stranica projekta); glavne interaktivne slike na
   stranici objekta/jedinice namjerno ostaju eager jer su iznad fold-a
 
-## Faza 8 — Finalni polish i priprema za produkciju ⬜
+## Faza 8 — Redizajn javnog frontenda ✅
+
+Na korisnikov zahtjev, Faza 8 je preusmjerena s izvornog "polish" checklista
+(vidi Fazu 9 niže, gdje su ti zadaci premješteni) na profesionalni vizualni
+redizajn javnog dijela stranice — cilj: "lijep dizajn, header, pozadinska
+slika, sekcije, da se razlikuje od drugih stranica".
+
+- [x] Dizajn sustav — Google Fonts (Figtree za tekst, Fraunces za naslove
+  preko `fonts.bunny.net`), paleta stone + emerald, prošireno u
+  `tailwind.config.js` (`font-sans`, `font-display`)
+- [x] Redizajn `layouts.public` — novi header s logom (kućica u zelenom
+  kvadratu + "Tabi" wordmark), navigacija, uvijek čitljiva pozadina
+  (blur + prozirnost, bez potpune prozirnosti preko heroa jer to lomi
+  čitljivost na stranicama bez tamne sekcije na vrhu), footer s 4 stupca
+  (brend, pregled, nalog, copyright)
+- [x] Reusable Blade komponente: `x-page-hero` (tamni gradient hero s
+  opcionalnom pozadinskom slikom, blueprint teksturom i valovitim prijelazom),
+  `x-project-card`, `x-unit-card`, `x-building-card`, `x-building-placeholder-icon`
+- [x] Redizajn naslovne — hero sa statistikom (broj projekata/jedinica/
+  dostupnih/lokacija), feature sekcija (3 ikone), istaknuti projekti/jedinice
+  s novim karticama
+- [x] Redizajn stranica Projekta/Objekta/Jedinice — `x-page-hero` s naslovom,
+  breadcrumbom i (gdje ima smisla) pozadinskom slikom fasade/naslovnice;
+  interaktivna fasada/tlocrt logika iz Faze 5/6 zadržana bez izmjena,
+  samo osvježeni CSS stilovi zona (uklonjen bug niskog kontrasta neaktivnih
+  prostorija na svijetlim tlocrtima u light modu)
+- [x] Redizajn listing stranica (`/projekti`, `/jedinice`) — lakši header,
+  filteri u kartici, rezultati kroz nove card komponente
+- [x] Browser provjera (Playwright, desktop + mobile viewport) svih
+  redizajniranih stranica — hero, kartice, hover/tap interakcija na
+  fasadi i tlocrtu, footer; bez PAGEERROR poruka u konzoli
+- [x] `php artisan test` — 91/91 prolazi (redizajn Blade markupa nije
+  pokvario postojeće feature testove)
+
+## Faza 9 — Finalni polish i priprema za produkciju ⬜
+
+(Izvorni sadržaj Faze 8, odgođen dok se nije obavio redizajn iz Faze 8.)
 
 - [ ] Testovi za autorizaciju (investitor ne smije vidjeti/uređivati tuđe podatke)
 - [ ] Testovi ključnih Livewire komponenti
@@ -181,7 +217,7 @@ hover/tap detekciju kao u editoru, samo bez mogućnosti crtanja/uređivanja).
 
 ## Status
 
-**Trenutna faza:** Faza 7 gotova. Sljedeća: Faza 8 — Finalni polish i priprema za produkciju.
+**Trenutna faza:** Faza 8 gotova. Sljedeća: Faza 9 — Finalni polish i priprema za produkciju.
 
 | Faza | Status |
 |---|---|
@@ -193,4 +229,5 @@ hover/tap detekciju kao u editoru, samo bez mogućnosti crtanja/uređivanja).
 | 5 — Poligon editor | ✅ |
 | 6 — Javni frontend | ✅ |
 | 7 — Pretraga/SEO | ✅ |
-| 8 — Polish/produkcija | ⬜ |
+| 8 — Redizajn frontenda | ✅ |
+| 9 — Polish/produkcija | ⬜ |
