@@ -130,15 +130,27 @@ pa se SVG sadržaj zona gradi kao HTML string (`x-html`) uz event delegation
 na `<svg>` korijenu, umjesto Alpine template direktiva unutar SVG-a. Koordinate
 poligona spremaju se kao postoci (0-100) relativno na sliku, neovisno o rezoluciji.
 
-## Faza 6 — Javni frontend ⬜
+## Faza 6 — Javni frontend ✅
 
-- [ ] Početna stranica: istaknuti/popularni Projekti i Jedinice
-- [ ] Stranica Projekta: interaktivna fasada Objekta — hover/klik na kat odmah
-  prikazuje detalje kata i listu jedinica na tom katu (bez dodatnog klika/modala,
-  za razliku od inkubator.hr primjera)
-- [ ] Stranica Jedinice: tlocrt s hover po prostorijama (naziv + m²), status badge
-  (dostupno/rezervirano/prodano), osnovni opis, cijena, m²
-- [ ] Responsive prikaz (mobitel — touch umjesto hover)
+- [x] Početna stranica: istaknuti/popularni Projekti i Jedinice
+  (`Public\HomePage`, `/`)
+- [x] Stranica Projekta (`/projekti/{project}`): info + kartice objekata
+- [x] Stranica Objekta (`/objekti/{building}`): interaktivna fasada — hover
+  (desktop) ili tap (mobitel) na kat na slici ODMAH prebacuje aktivni
+  kat i prikazuje listu jedinica s statusima, bez dodatnog klika/modala
+  (za razliku od inkubator.hr primjera); katovi bez nacrtane zone i
+  dalje dostupni kroz tab listu pored slike; jedinice bez kata (npr. kuće)
+  prikazane odvojeno ispod
+- [x] Stranica Jedinice (`/jedinice/{unit}`): tlocrt s hover po prostorijama
+  (naziv + m² prikazani na samoj zoni pri hoveru, sinkronizirano s
+  popisom prostorija sa strane), status badge (dostupno/rezervirano/
+  prodano), opis, cijena, m²
+- [x] Responsive prikaz — iste hover zone rade na dodir (tap) na mobitelu,
+  layout se prelama u jedan stupac ispod `lg` breakpointa
+
+Sve tri interaktivne stranice čitaju iste `polygon` podatke koje admin/
+investitor crtaju u Fazi 5 (postoci 0-100, ista point-in-polygon logika za
+hover/tap detekciju kao u editoru, samo bez mogućnosti crtanja/uređivanja).
 
 ## Faza 7 — Pretraga, filteri, SEO ⬜
 
@@ -157,7 +169,7 @@ poligona spremaju se kao postoci (0-100) relativno na sliku, neovisno o rezoluci
 
 ## Status
 
-**Trenutna faza:** Faza 5 gotova. Sljedeća: Faza 6 — Javni frontend.
+**Trenutna faza:** Faza 6 gotova. Sljedeća: Faza 7 — Pretraga, filteri, SEO.
 
 | Faza | Status |
 |---|---|
@@ -167,6 +179,6 @@ poligona spremaju se kao postoci (0-100) relativno na sliku, neovisno o rezoluci
 | 3 — Admin panel | ✅ |
 | 4 — Investitor panel | ✅ |
 | 5 — Poligon editor | ✅ |
-| 6 — Javni frontend | ⬜ |
+| 6 — Javni frontend | ✅ |
 | 7 — Pretraga/SEO | ⬜ |
 | 8 — Polish/produkcija | ⬜ |
