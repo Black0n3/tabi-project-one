@@ -46,15 +46,15 @@ Poligon (hotspot) zona živi na "djetetu" i referencira sliku "roditelja":
 
 ---
 
-## Faza 0 — Bootstrap projekta ⬜
+## Faza 0 — Bootstrap projekta ✅
 
-- [ ] `composer create-project laravel/laravel` u repo (zadržati postojeći README/.git)
-- [ ] Laravel Breeze (Livewire stack) instaliran kao baza za auth (bez Jetstream/Filament)
-- [ ] Tailwind CSS konfiguriran, osnovni layout
-- [ ] `.env.example` sređen, `.gitignore` provjeren
-- [ ] DB konekcija (SQLite za lokalni dev) + `php artisan migrate` prolazi
-- [ ] Pest ili PHPUnit test runner radi (`php artisan test`)
-- [ ] Osnovni `README.md` s uputama za pokretanje projekta
+- [x] `composer create-project laravel/laravel` u repo (zadržati postojeći README/.git)
+- [x] Laravel Breeze (Livewire stack) instaliran kao baza za auth (bez Jetstream/Filament)
+- [x] Tailwind CSS konfiguriran, osnovni layout
+- [x] `.env.example` sređen, `.gitignore` provjeren (dodano ignoriranje `database/*.sqlite`)
+- [x] DB konekcija (SQLite za lokalni dev) + `php artisan migrate` prolazi
+- [x] PHPUnit test runner radi (`php artisan test` — 26/26 testova prolazi)
+- [x] Osnovni `README.md` s uputama za pokretanje projekta
 
 ## Faza 1 — Autentikacija i role ⬜
 
@@ -128,11 +128,11 @@ Poligon (hotspot) zona živi na "djetetu" i referencira sliku "roditelja":
 
 ## Status
 
-**Trenutna faza:** Faza 0 — Bootstrap projekta (u tijeku)
+**Trenutna faza:** Faza 0 gotova. Sljedeća: Faza 1 — Autentikacija i role.
 
 | Faza | Status |
 |---|---|
-| 0 — Bootstrap | 🔶 |
+| 0 — Bootstrap | ✅ |
 | 1 — Auth i role | ⬜ |
 | 2 — Data model | ⬜ |
 | 3 — Admin panel | ⬜ |
