@@ -11,9 +11,14 @@
             <p class="text-sm text-gray-500 dark:text-gray-400">{{ $building->type->label() }} @if ($building->address) &middot; {{ $building->address }} @endif</p>
         </div>
 
-        <a href="{{ route($routePrefix.'buildings.edit', $building) }}" wire:navigate>
-            <x-secondary-button type="button">{{ __('Uredi') }}</x-secondary-button>
-        </a>
+        <div class="flex items-center gap-3">
+            <a href="{{ route($routePrefix.'buildings.zones', $building) }}" wire:navigate>
+                <x-secondary-button type="button">{{ __('Zone katova') }}</x-secondary-button>
+            </a>
+            <a href="{{ route($routePrefix.'buildings.edit', $building) }}" wire:navigate>
+                <x-secondary-button type="button">{{ __('Uredi') }}</x-secondary-button>
+            </a>
+        </div>
     </div>
 
     @if (session('status'))
@@ -39,6 +44,7 @@
                             <span class="text-gray-500 dark:text-gray-400">({{ $floor->units_count }} {{ __('jedinica') }})</span>
                         </div>
                         <div class="space-x-3">
+                            <a href="{{ route($routePrefix.'floors.zones', $floor) }}" wire:navigate class="text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('Zone jedinica') }}</a>
                             <a href="{{ route($routePrefix.'floors.edit', $floor) }}" wire:navigate class="text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('Uredi') }}</a>
                             <button type="button" wire:click="deleteFloor({{ $floor->id }})" wire:confirm="{{ __('Obrisati ovaj kat?') }}" class="text-red-600 dark:text-red-400 hover:underline">{{ __('Obriši') }}</button>
                         </div>

@@ -112,12 +112,23 @@ Poligon (hotspot) zona živi na "djetetu" i referencira sliku "roditelja":
 - [x] Upload slika za vlastite objekte/jedinice (isti upload flow kao admin,
   provjeren i s pravim uploadom kroz preglednik)
 
-## Faza 5 — Poligon editor (alat za crtanje zona) ⬜
+## Faza 5 — Poligon editor (alat za crtanje zona) ✅
 
-- [ ] Alpine.js/SVG komponenta: klik po slici dodaje točke poligona
-- [ ] Spremanje/uređivanje/brisanje poligona (JSON koordinate) za Kat, Jedinicu, Prostoriju
-- [ ] Pregled postojećih zona preko slike (edit mode) s mogućnošću pomicanja točaka
-- [ ] Vezanje zone na entitet (npr. novonacrtani poligon na fasadi → odabir/kreiranje Kata)
+- [x] Alpine.js/SVG komponenta: klik po slici dodaje točke poligona
+  (`x-zone-editor` Blade komponenta, `resources/views/components/zone-editor.blade.php`)
+- [x] Spremanje/uređivanje/brisanje poligona (JSON koordinate) za Kat, Jedinicu, Prostoriju
+  — `Shared\Buildings\ZonesPage` (fasada→katovi), `Shared\Floors\ZonesPage`
+  (tlocrt kata→jedinice), `Shared\Units\ZonesPage` (tlocrt jedinice→prostorije)
+- [x] Pregled postojećih zona preko slike (edit mode) s mogućnošću pomicanja točaka
+  (klik na zonu → prikaz vučnih vrhova, drag mijenja oblik, "Spremi promjene")
+- [x] Vezanje zone na entitet — nakon crtanja poligona admin/investitor bira
+  postojeću stavku bez zone ILI upisuje naziv za novu stavku koja se kreira
+  na licu mjesta i odmah poveže s nacrtanim poligonom
+
+Napomena: Alpine `x-for`/`x-if` direktive ne rade pouzdano unutar `<svg>` elementa,
+pa se SVG sadržaj zona gradi kao HTML string (`x-html`) uz event delegation
+na `<svg>` korijenu, umjesto Alpine template direktiva unutar SVG-a. Koordinate
+poligona spremaju se kao postoci (0-100) relativno na sliku, neovisno o rezoluciji.
 
 ## Faza 6 — Javni frontend ⬜
 
@@ -146,7 +157,7 @@ Poligon (hotspot) zona živi na "djetetu" i referencira sliku "roditelja":
 
 ## Status
 
-**Trenutna faza:** Faza 4 gotova. Sljedeća: Faza 5 — Poligon editor.
+**Trenutna faza:** Faza 5 gotova. Sljedeća: Faza 6 — Javni frontend.
 
 | Faza | Status |
 |---|---|
@@ -155,7 +166,7 @@ Poligon (hotspot) zona živi na "djetetu" i referencira sliku "roditelja":
 | 2 — Data model | ✅ |
 | 3 — Admin panel | ✅ |
 | 4 — Investitor panel | ✅ |
-| 5 — Poligon editor | ⬜ |
+| 5 — Poligon editor | ✅ |
 | 6 — Javni frontend | ⬜ |
 | 7 — Pretraga/SEO | ⬜ |
 | 8 — Polish/produkcija | ⬜ |

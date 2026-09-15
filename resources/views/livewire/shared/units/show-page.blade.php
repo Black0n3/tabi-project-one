@@ -27,9 +27,14 @@
             </p>
         </div>
 
-        <a href="{{ route($routePrefix.'units.edit', $unit) }}" wire:navigate>
-            <x-secondary-button type="button">{{ __('Uredi') }}</x-secondary-button>
-        </a>
+        <div class="flex items-center gap-3">
+            <a href="{{ route($routePrefix.'units.zones', $unit) }}" wire:navigate>
+                <x-secondary-button type="button">{{ __('Zone prostorija') }}</x-secondary-button>
+            </a>
+            <a href="{{ route($routePrefix.'units.edit', $unit) }}" wire:navigate>
+                <x-secondary-button type="button">{{ __('Uredi') }}</x-secondary-button>
+            </a>
+        </div>
     </div>
 
     @if ($unit->description)
