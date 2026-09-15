@@ -3,13 +3,13 @@
 namespace Tests\Feature\Admin;
 
 use App\Enums\UnitStatus;
-use App\Livewire\Admin\Buildings\Form as BuildingForm;
-use App\Livewire\Admin\Floors\Form as FloorForm;
 use App\Livewire\Admin\Investors\Form as InvestorForm;
 use App\Livewire\Admin\Investors\IndexPage as InvestorsIndex;
-use App\Livewire\Admin\Projects\Form as ProjectForm;
-use App\Livewire\Admin\Rooms\Form as RoomForm;
-use App\Livewire\Admin\Units\Form as UnitForm;
+use App\Livewire\Shared\Buildings\Form as BuildingForm;
+use App\Livewire\Shared\Floors\Form as FloorForm;
+use App\Livewire\Shared\Projects\Form as ProjectForm;
+use App\Livewire\Shared\Rooms\Form as RoomForm;
+use App\Livewire\Shared\Units\Form as UnitForm;
 use App\Models\Building;
 use App\Models\Floor;
 use App\Models\Investor;

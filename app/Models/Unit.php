@@ -55,4 +55,9 @@ class Unit extends Model
     {
         return $this->hasMany(Room::class);
     }
+
+    public function belongsToInvestor(?int $investorId): bool
+    {
+        return $this->building->belongsToInvestor($investorId);
+    }
 }

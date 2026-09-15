@@ -33,4 +33,9 @@ class Project extends Model
     {
         return $this->hasMany(Building::class);
     }
+
+    public function belongsToInvestor(?int $investorId): bool
+    {
+        return $investorId !== null && $this->investor_id === $investorId;
+    }
 }

@@ -96,12 +96,21 @@ Poligon (hotspot) zona živi na "djetetu" i referencira sliku "roditelja":
   hijerarhije pregledavaju se kroz "show" stranice roditelja (bez posebnog
   globalnog popisa — navigacija je kontekstualna)
 
-## Faza 4 — Investitor panel (CRUD) ⬜
+## Faza 4 — Investitor panel (CRUD) ✅
 
-- [ ] Investitor vidi i uređuje samo svoje Projekte/Objekte/Jedinice/Prostorije
-  (scoping po `investor_id`, autorizacija policy-jima)
-- [ ] Isti UI obrasci kao admin panel (dijeljene Livewire komponente gdje ima smisla)
-- [ ] Upload slika za vlastite objekte/jedinice
+- [x] Investitor vidi i uređuje samo svoje Projekte/Objekte/Jedinice/Prostorije
+  (scoping po `investor_id`, autorizacija Policy klasama: `ProjectPolicy`,
+  `BuildingPolicy`, `FloorPolicy`, `UnitPolicy`, `RoomPolicy`)
+- [x] Isti UI obrasci kao admin panel — CRUD komponente za
+  Projekte/Objekte/Katove/Jedinice/Prostorije preseljene u
+  `App\Livewire\Shared\*` i registrirane pod OBA panela (`/admin/...` i
+  `/investitor/...`), s dinamičkim layoutom i route-prefiksom prema roli
+  (`ResolvesPanelContext` trait). Investitor nema pristup CRUD-u za
+  Investitore (to ostaje isključivo admin), a njegov dashboard
+  (`App\Livewire\Investor\DashboardPage`) mu odmah prikazuje popis
+  vlastitih projekata
+- [x] Upload slika za vlastite objekte/jedinice (isti upload flow kao admin,
+  provjeren i s pravim uploadom kroz preglednik)
 
 ## Faza 5 — Poligon editor (alat za crtanje zona) ⬜
 
@@ -137,7 +146,7 @@ Poligon (hotspot) zona živi na "djetetu" i referencira sliku "roditelja":
 
 ## Status
 
-**Trenutna faza:** Faza 3 gotova. Sljedeća: Faza 4 — Investitor panel (CRUD).
+**Trenutna faza:** Faza 4 gotova. Sljedeća: Faza 5 — Poligon editor.
 
 | Faza | Status |
 |---|---|
@@ -145,7 +154,7 @@ Poligon (hotspot) zona živi na "djetetu" i referencira sliku "roditelja":
 | 1 — Auth i role | ✅ |
 | 2 — Data model | ✅ |
 | 3 — Admin panel | ✅ |
-| 4 — Investitor panel | ⬜ |
+| 4 — Investitor panel | ✅ |
 | 5 — Poligon editor | ⬜ |
 | 6 — Javni frontend | ⬜ |
 | 7 — Pretraga/SEO | ⬜ |

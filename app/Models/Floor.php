@@ -31,4 +31,9 @@ class Floor extends Model
     {
         return $this->hasMany(Unit::class)->orderBy('code');
     }
+
+    public function belongsToInvestor(?int $investorId): bool
+    {
+        return $this->building->belongsToInvestor($investorId);
+    }
 }

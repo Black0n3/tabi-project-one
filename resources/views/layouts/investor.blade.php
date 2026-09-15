@@ -29,15 +29,8 @@
                     <nav class="space-y-1">
                         <a href="{{ route('investitor.dashboard') }}" wire:navigate
                             class="block rounded-md px-3 py-2 text-sm font-medium {{ request()->routeIs('investitor.dashboard') ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800' }}">
-                            {{ __('Nadzorna ploča') }}
+                            {{ __('Moji projekti') }}
                         </a>
-
-                        <div class="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700 space-y-1">
-                            <p class="px-3 text-xs font-semibold uppercase text-gray-400 dark:text-gray-500">{{ __('Uskoro') }}</p>
-                            <span class="block rounded-md px-3 py-2 text-sm text-gray-400 dark:text-gray-600 cursor-not-allowed">{{ __('Projekti') }}</span>
-                            <span class="block rounded-md px-3 py-2 text-sm text-gray-400 dark:text-gray-600 cursor-not-allowed">{{ __('Objekti') }}</span>
-                            <span class="block rounded-md px-3 py-2 text-sm text-gray-400 dark:text-gray-600 cursor-not-allowed">{{ __('Jedinice') }}</span>
-                        </div>
                     </nav>
                 </aside>
 

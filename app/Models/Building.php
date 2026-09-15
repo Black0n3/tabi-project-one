@@ -37,4 +37,9 @@ class Building extends Model
     {
         return $this->hasMany(Unit::class);
     }
+
+    public function belongsToInvestor(?int $investorId): bool
+    {
+        return $this->project->belongsToInvestor($investorId);
+    }
 }

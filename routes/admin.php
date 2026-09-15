@@ -1,16 +1,16 @@
 <?php
 
-use App\Livewire\Admin\Buildings\Form as BuildingForm;
-use App\Livewire\Admin\Buildings\ShowPage as BuildingShow;
-use App\Livewire\Admin\Floors\Form as FloorForm;
 use App\Livewire\Admin\Investors\Form as InvestorForm;
 use App\Livewire\Admin\Investors\IndexPage as InvestorsIndex;
 use App\Livewire\Admin\Investors\ShowPage as InvestorShow;
-use App\Livewire\Admin\Projects\Form as ProjectForm;
-use App\Livewire\Admin\Projects\ShowPage as ProjectShow;
-use App\Livewire\Admin\Rooms\Form as RoomForm;
-use App\Livewire\Admin\Units\Form as UnitForm;
-use App\Livewire\Admin\Units\ShowPage as UnitShow;
+use App\Livewire\Shared\Buildings\Form as BuildingForm;
+use App\Livewire\Shared\Buildings\ShowPage as BuildingShow;
+use App\Livewire\Shared\Floors\Form as FloorForm;
+use App\Livewire\Shared\Projects\Form as ProjectForm;
+use App\Livewire\Shared\Projects\ShowPage as ProjectShow;
+use App\Livewire\Shared\Rooms\Form as RoomForm;
+use App\Livewire\Shared\Units\Form as UnitForm;
+use App\Livewire\Shared\Units\ShowPage as UnitShow;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified', 'role:admin'])

@@ -26,4 +26,9 @@ class Room extends Model
     {
         return $this->belongsTo(Unit::class);
     }
+
+    public function belongsToInvestor(?int $investorId): bool
+    {
+        return $this->unit->belongsToInvestor($investorId);
+    }
 }

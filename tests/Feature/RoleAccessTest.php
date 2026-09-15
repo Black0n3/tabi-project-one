@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Investor;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -32,12 +33,13 @@ class RoleAccessTest extends TestCase
 
     public function test_investor_can_access_investor_dashboard(): void
     {
-        $investor = User::factory()->investor()->create();
+        $investorUser = User::factory()->investor()->create();
+        Investor::factory()->for($investorUser, 'user')->create();
 
-        $this->actingAs($investor)
+        $this->actingAs($investorUser)
             ->get('/investitor/dashboard')
             ->assertOk()
-            ->assertSee('Nadzorna ploča');
+            ->assertSee('Moji projekti');
     }
 
     public function test_investor_cannot_access_admin_panel(): void
