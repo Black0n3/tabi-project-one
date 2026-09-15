@@ -20,7 +20,7 @@
                     <a href="{{ route('public.buildings.show', $building) }}" wire:navigate class="group block rounded-lg border border-gray-200 dark:border-gray-800 overflow-hidden hover:shadow-md transition">
                         <div class="aspect-[4/3] bg-gray-100 dark:bg-gray-800 overflow-hidden">
                             @if ($building->facade_image)
-                                <img src="{{ Storage::disk('public')->url($building->facade_image) }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="{{ $building->name }}">
+                                <img src="{{ Storage::disk('public')->url($building->facade_image) }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="{{ $building->name }}">
                             @else
                                 <div class="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-600 text-sm">{{ __('Bez slike') }}</div>
                             @endif

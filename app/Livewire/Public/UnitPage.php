@@ -30,6 +30,11 @@ class UnitPage extends Component
                 'area' => $room->area_m2 ? (float) $room->area_m2 : null,
                 'points' => $room->polygon,
             ]),
-        ])->layout('layouts.public', ['title' => $this->unit->building->project->name.' — '.$this->unit->code]);
+        ])->layout('layouts.public', [
+            'title' => $this->unit->building->project->name.' — '.$this->unit->code,
+            'description' => $this->unit->description
+                ?: "{$this->unit->type->label()} {$this->unit->code}, {$this->unit->area_m2} m², {$this->unit->status->label()}.",
+            'image' => $this->unit->floor_plan_image ? Storage::disk('public')->url($this->unit->floor_plan_image) : null,
+        ]);
     }
 }

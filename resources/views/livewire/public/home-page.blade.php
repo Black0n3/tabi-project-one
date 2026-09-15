@@ -7,7 +7,12 @@
     </section>
 
     <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        <h2 class="text-xl font-semibold mb-6">{{ __('Istaknuti projekti') }}</h2>
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-semibold">{{ __('Istaknuti projekti') }}</h2>
+            <a href="{{ route('public.projects.index') }}" wire:navigate class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
+                {{ __('Svi projekti') }} →
+            </a>
+        </div>
 
         @if ($projects->isEmpty())
             <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Trenutno nema objavljenih projekata.') }}</p>
@@ -17,7 +22,7 @@
                     <a href="{{ route('public.projects.show', $project) }}" wire:navigate class="group block rounded-lg border border-gray-200 dark:border-gray-800 overflow-hidden hover:shadow-md transition">
                         <div class="aspect-[4/3] bg-gray-100 dark:bg-gray-800 overflow-hidden">
                             @if ($project->cover_image)
-                                <img src="{{ Storage::disk('public')->url($project->cover_image) }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="{{ $project->name }}">
+                                <img src="{{ Storage::disk('public')->url($project->cover_image) }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="{{ $project->name }}">
                             @else
                                 <div class="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-600 text-sm">{{ __('Bez slike') }}</div>
                             @endif
@@ -36,7 +41,12 @@
     </section>
 
     <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
-        <h2 class="text-xl font-semibold mb-6">{{ __('Istaknute jedinice') }}</h2>
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-semibold">{{ __('Istaknute jedinice') }}</h2>
+            <a href="{{ route('public.units.index') }}" wire:navigate class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
+                {{ __('Sve jedinice') }} →
+            </a>
+        </div>
 
         @if ($units->isEmpty())
             <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Trenutno nema objavljenih jedinica.') }}</p>
@@ -46,7 +56,7 @@
                     <a href="{{ route('public.units.show', $unit) }}" wire:navigate class="group block rounded-lg border border-gray-200 dark:border-gray-800 overflow-hidden hover:shadow-md transition">
                         <div class="aspect-square bg-gray-100 dark:bg-gray-800 overflow-hidden">
                             @if ($unit->floor_plan_image)
-                                <img src="{{ Storage::disk('public')->url($unit->floor_plan_image) }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="{{ $unit->code }}">
+                                <img src="{{ Storage::disk('public')->url($unit->floor_plan_image) }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="{{ $unit->code }}">
                             @else
                                 <div class="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-600 text-sm">{{ __('Bez tlocrta') }}</div>
                             @endif

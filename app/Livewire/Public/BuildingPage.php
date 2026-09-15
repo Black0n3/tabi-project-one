@@ -46,6 +46,10 @@ class BuildingPage extends Component
                 ]),
             ]),
             'unassignedUnits' => $unassignedUnits,
-        ])->layout('layouts.public', ['title' => $this->building->name]);
+        ])->layout('layouts.public', [
+            'title' => $this->building->name,
+            'description' => "{$this->building->name} — {$this->building->type->label()}, {$this->building->project->name}",
+            'image' => $this->building->facade_image ? Storage::disk('public')->url($this->building->facade_image) : null,
+        ]);
     }
 }

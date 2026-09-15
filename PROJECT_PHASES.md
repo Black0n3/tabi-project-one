@@ -152,11 +152,23 @@ Sve tri interaktivne stranice čitaju iste `polygon` podatke koje admin/
 investitor crtaju u Fazi 5 (postoci 0-100, ista point-in-polygon logika za
 hover/tap detekciju kao u editoru, samo bez mogućnosti crtanja/uređivanja).
 
-## Faza 7 — Pretraga, filteri, SEO ⬜
+## Faza 7 — Pretraga, filteri, SEO ✅
 
-- [ ] Filteri na listi projekata/jedinica (lokacija, status, m², cijena)
-- [ ] Meta tagovi, sitemap.xml
-- [ ] Optimizacija slika (lazy load, responsive images)
+- [x] Nove stranice za popis SVIH projekata/jedinica (`/projekti`, `/jedinice`,
+  `Public\ProjectsIndex`, `Public\UnitsIndex`) s live filterima bez reloada
+  stranice: projekti — lokacija, status; jedinice — lokacija (preko projekta),
+  status, tip, min/max m², min/max cijena. Filteri se sinkroniziraju s query
+  stringom (`#[Url]`) pa su rezultati pretrage shareable linkom. Naslovna i
+  navigacija linkaju na ove stranice ("Svi projekti" / "Sve jedinice")
+- [x] Meta tagovi — `<meta name="description">`, Open Graph (`og:title`,
+  `og:description`, `og:image`, `og:url`), `<link rel="canonical">` u
+  `layouts.public`, dinamički po stranici (opis projekta/objekta/jedinice,
+  slika naslovnice/fasade/tlocrta kao og:image)
+- [x] `sitemap.xml` (`SitemapController`, ruta `sitemap`) — nabraja naslovnu,
+  oba popisa i sve pojedinačne projekte/objekte/jedinice s `lastmod`
+- [x] Lazy loading slika (`loading="lazy"`) na svim kartičnim prikazima
+  (naslovna, popisi, stranica projekta); glavne interaktivne slike na
+  stranici objekta/jedinice namjerno ostaju eager jer su iznad fold-a
 
 ## Faza 8 — Finalni polish i priprema za produkciju ⬜
 
@@ -169,7 +181,7 @@ hover/tap detekciju kao u editoru, samo bez mogućnosti crtanja/uređivanja).
 
 ## Status
 
-**Trenutna faza:** Faza 6 gotova. Sljedeća: Faza 7 — Pretraga, filteri, SEO.
+**Trenutna faza:** Faza 7 gotova. Sljedeća: Faza 8 — Finalni polish i priprema za produkciju.
 
 | Faza | Status |
 |---|---|
@@ -180,5 +192,5 @@ hover/tap detekciju kao u editoru, samo bez mogućnosti crtanja/uređivanja).
 | 4 — Investitor panel | ✅ |
 | 5 — Poligon editor | ✅ |
 | 6 — Javni frontend | ✅ |
-| 7 — Pretraga/SEO | ⬜ |
+| 7 — Pretraga/SEO | ✅ |
 | 8 — Polish/produkcija | ⬜ |
