@@ -67,19 +67,20 @@ Poligon (hotspot) zona živi na "djetetu" i referencira sliku "roditelja":
 - [x] Investitor se NE može self-registrirati — ruta `/register` uklonjena,
   nalog kreira isključivo admin (seeder sad, admin CRUD u Fazi 3)
 
-## Faza 2 — Data model (migracije + modeli) ⬜
+## Faza 2 — Data model (migracije + modeli) ✅
 
-- [ ] `investors` (naziv tvrtke, OIB, kontakt, logo, veza na `users`)
-- [ ] `projects` (naziv, opis, lokacija, status, cover slika, `investor_id`, `is_featured`)
-- [ ] `buildings` — "Objekat" (naziv, tip: zgrada/urbana vila/kuća, adresa,
+- [x] `investors` (naziv tvrtke, OIB, kontakt, logo, veza na `users`)
+- [x] `projects` (naziv, opis, lokacija, status, cover slika, `investor_id`, `is_featured`)
+- [x] `buildings` — "Objekat" (naziv, tip: zgrada/urbana vila/kuća, adresa,
   slika fasade, `project_id`)
-- [ ] `floors` — "Kat" (label, redoslijed, poligon JSON na fasadi, slika tlocrta kata,
+- [x] `floors` — "Kat" (label, redoslijed, poligon JSON na fasadi, slika tlocrta kata,
   `building_id`)
-- [ ] `units` — "Jedinica" (broj/oznaka, tip: stan/kuća, m², cijena, status,
+- [x] `units` — "Jedinica" (broj/oznaka, tip: stan/kuća, m², cijena, status,
   opis, slika tlocrta, poligon JSON, `building_id`, `floor_id` nullable, `is_featured`)
-- [ ] `rooms` — "Prostorija" (naziv, m², poligon JSON, `unit_id`)
-- [ ] Eloquent relacije (Investor→Project→Building→Floor→Unit→Room) + factories/seederi
-  s demo podacima za razvoj
+- [x] `rooms` — "Prostorija" (naziv, m², poligon JSON, `unit_id`)
+- [x] Eloquent relacije (Investor→Project→Building→Floor→Unit→Room) + factories/seederi
+  s demo podacima za razvoj (`DemoDataSeeder` — Sunčani Vrt d.o.o. → Rezidencija
+  Sunčani Vrt → Zgrada A → 3 kata → 3 jedinice → prostorije)
 
 ## Faza 3 — Globalni admin panel (CRUD) ⬜
 
@@ -130,13 +131,13 @@ Poligon (hotspot) zona živi na "djetetu" i referencira sliku "roditelja":
 
 ## Status
 
-**Trenutna faza:** Faza 1 gotova. Sljedeća: Faza 2 — Data model.
+**Trenutna faza:** Faza 2 gotova. Sljedeća: Faza 3 — Globalni admin panel (CRUD).
 
 | Faza | Status |
 |---|---|
 | 0 — Bootstrap | ✅ |
 | 1 — Auth i role | ✅ |
-| 2 — Data model | ⬜ |
+| 2 — Data model | ✅ |
 | 3 — Admin panel | ⬜ |
 | 4 — Investitor panel | ⬜ |
 | 5 — Poligon editor | ⬜ |

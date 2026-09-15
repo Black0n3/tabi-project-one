@@ -27,5 +27,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'investitor@tabi.hr',
             'role' => UserRole::Investor,
         ]);
+
+        $this->call(DemoDataSeeder::class);
     }
 }
