@@ -204,20 +204,48 @@ slika, sekcije, da se razlikuje od drugih stranica".
 - [x] `php artisan test` — 91/91 prolazi (redizajn Blade markupa nije
   pokvario postojeće feature testove)
 
-## Faza 9 — Finalni polish i priprema za produkciju ⬜
+## Faza 9 — Finalni polish i priprema za produkciju ✅
 
 (Izvorni sadržaj Faze 8, odgođen dok se nije obavio redizajn iz Faze 8.)
 
-- [ ] Testovi za autorizaciju (investitor ne smije vidjeti/uređivati tuđe podatke)
-- [ ] Testovi ključnih Livewire komponenti
-- [ ] Performance provjera (N+1 queryji, indeksi)
-- [ ] Deployment checklist (env, storage link, queue/cache config)
+- [x] Testovi za autorizaciju (investitor ne smije vidjeti/uređivati tuđe
+  podatke) — pregled postojećeg pokrivanja (RoleAccessTest, InvestorCrudTest,
+  ZoneEditorTest) i popunjavanje rupa: dodani testovi za
+  `FloorZones`/`UnitZones` cross-tenant forbidden (prije je bio pokriven
+  samo `BuildingZones`). Usput otkriven i ispravljen pravi authorization/
+  data-integrity bug: `Shared\Units\Form` je validirao `floor_id` samo s
+  `exists:floors,id`, bez provjere da kat pripada istoj zgradi — investitor
+  je mogao spojiti vlastitu jedinicu na kat iz tuđe zgrade/investitora
+  (`Rule::exists('floors','id')->where('building_id', ...)` + regresijski
+  test)
+- [x] Testovi ključnih Livewire komponenti — postojeće pokrivanje
+  (Admin/InvestorCrud/ZoneEditor/Public) already solidno; dopunjeno gore
+  navedenim edge-caseovima
+- [x] Performance provjera (N+1 queryji, indeksi) — pregledane sve javne i
+  admin/investitor Livewire komponente; pronađen i ispravljen N+1 u
+  `Public\BuildingPage` (`$unassignedUnits` nije eager-loadao
+  `building.project`, a `<x-unit-card>` na njih pristupa), s regresijskim
+  testom koji broji SQL upite i potvrđuje da se broj ne mijenja s brojem
+  jedinica. Dodana migracija s indeksima na `projects.status`,
+  `projects.is_featured`, `units.status`, `units.type`, `units.is_featured`
+  (kolone po kojima javne listing stranice filtriraju/sortiraju) — FK
+  kolone već imaju indekse kroz `foreignId()->constrained()`
+- [x] Deployment checklist (env, storage link, queue/cache config) —
+  novi [`DEPLOYMENT.md`](./DEPLOYMENT.md): produkcijski `.env` (MySQL,
+  `APP_DEBUG=false`, `APP_KEY`), build/migrate koraci, `storage:link`
+  (kritično za sve uploadane slike), upozorenje da se demo seeder ne
+  pokreće u produkciji, cache/optimize koraci, napomena da queue
+  worker/cron scheduler trenutno nisu potrebni (aplikacija ih ne koristi)
+
+91 postojećih + 4 nova testa = 95/95 prolazi.
 
 ---
 
 ## Status
 
-**Trenutna faza:** Faza 8 gotova. Sljedeća: Faza 9 — Finalni polish i priprema za produkciju.
+**Trenutna faza:** Faza 9 gotova. Aplikacija je funkcionalno kompletna prema
+izvornom planu (Faze 0-9); sljedeći koraci su po potrebi/feedbacku, ne po
+unaprijed definiranom checklistu.
 
 | Faza | Status |
 |---|---|
@@ -230,4 +258,4 @@ slika, sekcije, da se razlikuje od drugih stranica".
 | 6 — Javni frontend | ✅ |
 | 7 — Pretraga/SEO | ✅ |
 | 8 — Redizajn frontenda | ✅ |
-| 9 — Polish/produkcija | ⬜ |
+| 9 — Polish/produkcija | ✅ |

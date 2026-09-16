@@ -184,6 +184,27 @@ class InvestorCrudTest extends TestCase
         $this->assertNotSame($otherInvestor->id, $project->investor_id);
     }
 
+    public function test_investor_cannot_attach_own_unit_to_a_floor_from_another_investors_building(): void
+    {
+        $ownProject = Project::factory()->for($this->investor)->create();
+        $ownBuilding = Building::factory()->for($ownProject)->create();
+        $unit = Unit::factory()->for($ownBuilding, 'building')->create(['floor_id' => null]);
+
+        $foreignBuilding = Building::factory()->create();
+        $foreignFloor = Floor::factory()->for($foreignBuilding)->create();
+
+        $this->actingAs($this->investorUser);
+
+        Livewire::test(UnitForm::class, ['unit' => $unit])
+            ->set('code', $unit->code)
+            ->set('area_m2', (string) $unit->area_m2)
+            ->set('floor_id', $foreignFloor->id)
+            ->call('save')
+            ->assertHasErrors(['floor_id']);
+
+        $this->assertNull($unit->fresh()->floor_id);
+    }
+
     public function test_investor_form_pages_render_with_investor_layout(): void
     {
         $this->actingAs($this->investorUser)

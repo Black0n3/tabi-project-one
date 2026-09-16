@@ -9,6 +9,7 @@ use App\Models\Project;
 use App\Models\Room;
 use App\Models\Unit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class PublicPagesTest extends TestCase
@@ -66,6 +67,26 @@ class PublicPagesTest extends TestCase
         $this->get(route('public.buildings.show', $building))
             ->assertOk()
             ->assertSee('Kuca 1');
+    }
+
+    public function test_building_page_does_not_n_plus_one_on_unassigned_units(): void
+    {
+        $building = Building::factory()->create();
+        Unit::factory()->for($building)->count(2)->create(['floor_id' => null]);
+
+        DB::enableQueryLog();
+        $this->get(route('public.buildings.show', $building))->assertOk();
+        $queryCountWithTwo = count(DB::getQueryLog());
+        DB::flushQueryLog();
+
+        Unit::factory()->for($building)->count(3)->create(['floor_id' => null]);
+        DB::flushQueryLog();
+
+        $this->get(route('public.buildings.show', $building))->assertOk();
+        $queryCountWithFive = count(DB::getQueryLog());
+        DB::disableQueryLog();
+
+        $this->assertSame($queryCountWithTwo, $queryCountWithFive);
     }
 
     public function test_building_page_without_facade_image_shows_placeholder(): void

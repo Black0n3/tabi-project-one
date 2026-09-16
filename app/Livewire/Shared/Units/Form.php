@@ -7,6 +7,7 @@ use App\Enums\UnitType;
 use App\Livewire\Concerns\ResolvesPanelContext;
 use App\Models\Building;
 use App\Models\Unit;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -70,7 +71,7 @@ class Form extends Component
             'area_m2' => ['required', 'numeric', 'min:0'],
             'price' => ['nullable', 'numeric', 'min:0'],
             'status' => ['required', 'string', 'in:'.implode(',', array_column(UnitStatus::cases(), 'value'))],
-            'floor_id' => ['nullable', 'exists:floors,id'],
+            'floor_id' => ['nullable', Rule::exists('floors', 'id')->where('building_id', $this->building->id)],
             'description' => ['nullable', 'string'],
             'is_featured' => ['boolean'],
             'floor_plan_image' => ['nullable', 'image', 'max:4096'],

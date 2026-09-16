@@ -121,4 +121,30 @@ class ZoneEditorTest extends TestCase
         Livewire::test(BuildingZones::class, ['building' => $foreignBuilding])
             ->assertForbidden();
     }
+
+    public function test_investor_cannot_open_zones_editor_for_another_investors_floor(): void
+    {
+        $investorUser = User::factory()->investor()->create();
+        Investor::factory()->for($investorUser, 'user')->create();
+
+        $foreignFloor = Floor::factory()->create();
+
+        $this->actingAs($investorUser);
+
+        Livewire::test(FloorZones::class, ['floor' => $foreignFloor])
+            ->assertForbidden();
+    }
+
+    public function test_investor_cannot_open_zones_editor_for_another_investors_unit(): void
+    {
+        $investorUser = User::factory()->investor()->create();
+        Investor::factory()->for($investorUser, 'user')->create();
+
+        $foreignUnit = Unit::factory()->create();
+
+        $this->actingAs($investorUser);
+
+        Livewire::test(UnitZones::class, ['unit' => $foreignUnit])
+            ->assertForbidden();
+    }
 }

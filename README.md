@@ -5,6 +5,7 @@ s interaktivnom vizualizacijom zgrada (fasada → katovi → jedinice → prosto
 i dva admin panela (globalni admin + panel investitora).
 
 Plan razvoja i arhitektonske odluke prati se u [`PROJECT_PHASES.md`](./PROJECT_PHASES.md).
+Checklist za produkcijski deploy je u [`DEPLOYMENT.md`](./DEPLOYMENT.md).
 
 ## Stack
 

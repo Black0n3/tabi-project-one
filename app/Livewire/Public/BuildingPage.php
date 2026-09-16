@@ -25,6 +25,7 @@ class BuildingPage extends Component
             ->get();
 
         $unassignedUnits = $this->building->units()
+            ->with('building.project')
             ->whereNull('floor_id')
             ->orderBy('code')
             ->get();
