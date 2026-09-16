@@ -10,8 +10,10 @@ checklist, ne punopravni infra-as-code setup — prilagodi konkretnom hostingu
   `pdo_sqlite` ako ipak ostaješ na SQLite-u), `mbstring`, `xml`, `curl`,
   `fileinfo`, `zip`, `gd` ili `intl` po potrebi
 - Composer 2.x
-- Node 20+ / npm (samo za build koraka, ne treba na serveru u runtimeu ako
-  se assets buildaju u CI i samo kopiraju `public/build`)
+- Node `^20.19.0` ili `>=22.12.0` (`package.json` → `"engines"`; Vite 8
+  zahtijeva ovu granicu, starija verzija puca s `node:util styleText`
+  greškom) / npm — samo za build korak, ne treba na serveru u runtimeu ako
+  se assets buildaju u CI i samo kopiraju `public/build`
 - Web server (nginx/Apache) usmjeren na `public/` kao document root
 
 ## 2. `.env` za produkciju
