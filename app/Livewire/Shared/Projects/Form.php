@@ -6,6 +6,7 @@ use App\Enums\ProjectStatus;
 use App\Livewire\Concerns\ResolvesPanelContext;
 use App\Models\Investor;
 use App\Models\Project;
+use App\Support\ImageUploads;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -29,6 +30,8 @@ class Form extends Component
 
     public bool $is_featured = false;
 
+    public bool $is_hidden = false;
+
     public $cover_image = null;
 
     public function mount(?Project $project = null, ?int $investorId = null): void
@@ -45,6 +48,7 @@ class Form extends Component
             $this->location = (string) $project->location;
             $this->status = $project->status->value;
             $this->is_featured = $project->is_featured;
+            $this->is_hidden = $project->is_hidden;
         } elseif (auth()->user()->isAdmin()) {
             $this->investor = Investor::findOrFail($investorId ?? request()->integer('investor'));
         } else {
@@ -60,7 +64,8 @@ class Form extends Component
             'location' => ['nullable', 'string', 'max:255'],
             'status' => ['required', 'string', 'in:'.implode(',', array_column(ProjectStatus::cases(), 'value'))],
             'is_featured' => ['boolean'],
-            'cover_image' => ['nullable', 'image', 'max:4096'],
+            'is_hidden' => ['boolean'],
+            'cover_image' => ['nullable', 'image', 'max:8192'],
         ];
     }
 
@@ -72,7 +77,7 @@ class Form extends Component
         $project->fill($validated);
 
         if ($this->cover_image) {
-            $project->cover_image = $this->cover_image->store('projects/covers', 'public');
+            $project->cover_image = ImageUploads::storeAsWebp($this->cover_image, 'projects/covers');
         }
 
         $project->save();

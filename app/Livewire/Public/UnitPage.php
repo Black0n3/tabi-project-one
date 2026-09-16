@@ -13,6 +13,8 @@ class UnitPage extends Component
 
     public function mount(Unit $unit): void
     {
+        abort_if($unit->building->project->is_hidden, 404);
+
         $this->unit = $unit;
     }
 

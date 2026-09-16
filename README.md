@@ -51,6 +51,29 @@ nvm use 22
 node -v   # treba biti 22.12+
 ```
 
+**Upload slika (`The [polje] failed to upload`)**: ako se ova greška pojavi
+čim odabereš sliku (prije nego uopće klikneš "Spremi"), uzrok je gotovo
+sigurno PHP-ov `upload_max_filesize`/`post_max_size` limit u `php.ini`, ne
+tip datoteke — Ubuntov/Debianov default je `upload_max_filesize=2M`, a PNG
+screenshotovi (pogotovo oni s puno teksta/UI-a) lako prijeđu 2MB dok
+komprimirani JPG iste veličine slike ne prijeđe. Provjeri i podigni limite:
+
+```bash
+php --ini   # pokaže putanju do učitanog php.ini-a
+```
+
+U tom fileu podigni (npr. na 20M) i restartaj `php artisan serve`:
+
+```ini
+upload_max_filesize = 20M
+post_max_size = 20M
+```
+
+Sve uploadane slike (logo, naslovnica, fasada, tlocrtovi) se nakon uploada
+automatski pretvaraju u WebP (manje datoteke, brže učitavanje, bolje za SEO)
+i skaliraju na max 2000px širine — pa i nakon podizanja limita, originali
+ne "ostaju" veliki na disku.
+
 ## Pokretanje projekta lokalno
 
 ```bash

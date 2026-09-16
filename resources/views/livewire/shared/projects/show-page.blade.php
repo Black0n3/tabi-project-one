@@ -10,6 +10,9 @@
                 @if ($project->is_featured)
                     <span class="ms-2 inline-flex items-center rounded-full bg-amber-100 dark:bg-amber-900/40 px-2 py-0.5 text-xs text-amber-800 dark:text-amber-300">{{ __('Istaknuto') }}</span>
                 @endif
+                @if ($project->is_hidden)
+                    <span class="ms-2 inline-flex items-center rounded-full bg-gray-200 dark:bg-gray-700 px-2 py-0.5 text-xs text-gray-700 dark:text-gray-300">{{ __('Skriveno') }}</span>
+                @endif
             </h2>
             <p class="text-sm text-gray-500 dark:text-gray-400">{{ $project->location }} &middot; {{ $project->status->label() }}</p>
         </div>

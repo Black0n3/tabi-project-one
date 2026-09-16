@@ -33,6 +33,7 @@ class ProjectsIndex extends Component
     public function render()
     {
         $projects = Project::query()
+            ->visible()
             ->with('investor')
             ->withCount('buildings')
             ->when($this->location, fn ($query) => $query->where('location', 'like', "%{$this->location}%"))

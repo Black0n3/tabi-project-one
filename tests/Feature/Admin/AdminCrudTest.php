@@ -55,6 +55,24 @@ class AdminCrudTest extends TestCase
         $investor = Investor::where('company_name', 'Marić Gradnja d.o.o.')->firstOrFail();
         $this->assertNotNull($investor->logo_path);
         Storage::disk('public')->assertExists($investor->logo_path);
+        $this->assertStringEndsWith('.webp', $investor->logo_path);
+    }
+
+    public function test_uploaded_png_is_converted_to_webp(): void
+    {
+        Livewire::test(InvestorForm::class)
+            ->set('name', 'Ana Anić')
+            ->set('email', 'ana@primjer.hr')
+            ->set('password', 'lozinka123')
+            ->set('company_name', 'Anić Gradnja d.o.o.')
+            ->set('logo', UploadedFile::fake()->image('logo.png'))
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $investor = Investor::where('company_name', 'Anić Gradnja d.o.o.')->firstOrFail();
+
+        $this->assertStringEndsWith('.webp', $investor->logo_path);
+        $this->assertSame('image/webp', Storage::disk('public')->mimeType($investor->logo_path));
     }
 
     public function test_investor_creation_requires_unique_email(): void
@@ -124,6 +142,21 @@ class AdminCrudTest extends TestCase
         $project = Project::where('name', 'Rezidencija Test')->firstOrFail();
         $this->assertSame($investor->id, $project->investor_id);
         Storage::disk('public')->assertExists($project->cover_image);
+        $this->assertStringEndsWith('.webp', $project->cover_image);
+    }
+
+    public function test_admin_can_mark_a_project_as_hidden(): void
+    {
+        $investor = Investor::factory()->create();
+
+        Livewire::test(ProjectForm::class, ['investorId' => $investor->id])
+            ->set('name', 'Interni Projekt')
+            ->set('is_hidden', true)
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $project = Project::where('name', 'Interni Projekt')->firstOrFail();
+        $this->assertTrue($project->is_hidden);
     }
 
     public function test_admin_can_create_building_for_a_project(): void
@@ -140,6 +173,7 @@ class AdminCrudTest extends TestCase
         $building = Building::where('name', 'Zgrada B')->firstOrFail();
         $this->assertSame($project->id, $building->project_id);
         Storage::disk('public')->assertExists($building->facade_image);
+        $this->assertStringEndsWith('.webp', $building->facade_image);
     }
 
     public function test_admin_can_create_floor_for_a_building(): void

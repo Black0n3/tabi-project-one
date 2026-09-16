@@ -13,6 +13,8 @@ class BuildingPage extends Component
 
     public function mount(Building $building): void
     {
+        abort_if($building->project->is_hidden, 404);
+
         $this->building = $building;
     }
 

@@ -13,6 +13,8 @@ class ProjectPage extends Component
 
     public function mount(Project $project): void
     {
+        abort_if($project->is_hidden, 404);
+
         $this->project = $project;
     }
 

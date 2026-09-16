@@ -6,6 +6,7 @@ use App\Enums\BuildingType;
 use App\Livewire\Concerns\ResolvesPanelContext;
 use App\Models\Building;
 use App\Models\Project;
+use App\Support\ImageUploads;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -51,7 +52,7 @@ class Form extends Component
             'name' => ['required', 'string', 'max:255'],
             'type' => ['required', 'string', 'in:'.implode(',', array_column(BuildingType::cases(), 'value'))],
             'address' => ['nullable', 'string', 'max:255'],
-            'facade_image' => ['nullable', 'image', 'max:4096'],
+            'facade_image' => ['nullable', 'image', 'max:8192'],
         ];
     }
 
@@ -63,7 +64,7 @@ class Form extends Component
         $building->fill($validated);
 
         if ($this->facade_image) {
-            $building->facade_image = $this->facade_image->store('buildings/facades', 'public');
+            $building->facade_image = ImageUploads::storeAsWebp($this->facade_image, 'buildings/facades');
         }
 
         $building->save();

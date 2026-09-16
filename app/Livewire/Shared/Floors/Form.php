@@ -5,6 +5,7 @@ namespace App\Livewire\Shared\Floors;
 use App\Livewire\Concerns\ResolvesPanelContext;
 use App\Models\Building;
 use App\Models\Floor;
+use App\Support\ImageUploads;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -46,7 +47,7 @@ class Form extends Component
         return [
             'label' => ['required', 'string', 'max:255'],
             'order' => ['required', 'integer', 'min:0'],
-            'floor_plan_image' => ['nullable', 'image', 'max:4096'],
+            'floor_plan_image' => ['nullable', 'image', 'max:8192'],
         ];
     }
 
@@ -58,7 +59,7 @@ class Form extends Component
         $floor->fill($validated);
 
         if ($this->floor_plan_image) {
-            $floor->floor_plan_image = $this->floor_plan_image->store('floors/plans', 'public');
+            $floor->floor_plan_image = ImageUploads::storeAsWebp($this->floor_plan_image, 'floors/plans');
         }
 
         $floor->save();

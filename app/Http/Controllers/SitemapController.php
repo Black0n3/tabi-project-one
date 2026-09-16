@@ -17,15 +17,15 @@ class SitemapController extends Controller
             ['loc' => route('public.units.index'), 'lastmod' => now()],
         ]);
 
-        foreach (Project::all(['id', 'updated_at']) as $project) {
+        foreach (Project::query()->visible()->get(['id', 'updated_at']) as $project) {
             $urls->push(['loc' => route('public.projects.show', $project), 'lastmod' => $project->updated_at]);
         }
 
-        foreach (Building::all(['id', 'updated_at']) as $building) {
+        foreach (Building::query()->whereHas('project', fn ($query) => $query->visible())->get(['id', 'updated_at']) as $building) {
             $urls->push(['loc' => route('public.buildings.show', $building), 'lastmod' => $building->updated_at]);
         }
 
-        foreach (Unit::all(['id', 'updated_at']) as $unit) {
+        foreach (Unit::query()->whereHas('building.project', fn ($query) => $query->visible())->get(['id', 'updated_at']) as $unit) {
             $urls->push(['loc' => route('public.units.show', $unit), 'lastmod' => $unit->updated_at]);
         }
 

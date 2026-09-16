@@ -52,6 +52,11 @@
             <span class="text-sm text-gray-700 dark:text-gray-300">{{ __('Istaknuti projekt (prikazuje se na početnoj stranici)') }}</span>
         </label>
 
+        <label class="flex items-center gap-2">
+            <input wire:model="is_hidden" type="checkbox" class="rounded border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500">
+            <span class="text-sm text-gray-700 dark:text-gray-300">{{ __('Skriveno (projekt se ne prikazuje nigdje na javnom sajtu, ali ostaje vidljiv u ovom panelu)') }}</span>
+        </label>
+
         <div class="flex items-center gap-3">
             <x-primary-button>{{ __('Spremi') }}</x-primary-button>
             <a href="{{ $project ? route($routePrefix.'projects.show', $project) : $investorUrl }}" wire:navigate>

@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Investors;
 use App\Enums\UserRole;
 use App\Models\Investor;
 use App\Models\User;
+use App\Support\ImageUploads;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -63,7 +64,7 @@ class Form extends Component
             'oib' => ['nullable', 'string', 'max:32'],
             'contact_phone' => ['nullable', 'string', 'max:64'],
             'contact_email' => ['nullable', 'email', 'max:255'],
-            'logo' => ['nullable', 'image', 'max:2048'],
+            'logo' => ['nullable', 'image', 'max:8192'],
         ];
     }
 
@@ -100,7 +101,7 @@ class Form extends Component
             ]);
 
             if ($this->logo) {
-                $investor->logo_path = $this->logo->store('investors/logos', 'public');
+                $investor->logo_path = ImageUploads::storeAsWebp($this->logo, 'investors/logos');
             }
 
             $investor->save();

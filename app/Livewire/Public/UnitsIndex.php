@@ -44,6 +44,7 @@ class UnitsIndex extends Component
     public function render()
     {
         $units = Unit::query()
+            ->whereHas('building.project', fn ($query) => $query->visible())
             ->with('building.project')
             ->when($this->status, fn ($query) => $query->where('status', $this->status))
             ->when($this->type, fn ($query) => $query->where('type', $this->type))

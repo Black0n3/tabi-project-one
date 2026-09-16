@@ -259,3 +259,18 @@ unaprijed definiranom checklistu.
 | 7 — Pretraga/SEO | ✅ |
 | 8 — Redizajn frontenda | ✅ |
 | 9 — Polish/produkcija | ✅ |
+
+## Naknadna poboljšanja (nakon Faze 9, po feedbacku iz stvarnog testiranja)
+
+- **Vidljivost projekta** — `projects.is_hidden` (checkbox u formi). Skriveni
+  projekt se ne pojavljuje nigdje na javnom sajtu (naslovna, popisi,
+  statistika, sitemap), a direktan link na njega/njegove objekte/jedinice
+  vraća 404. Ostaje potpuno vidljiv i uređiv u admin/investitor panelu --
+  za projekte koji su "u pripremi" i još ne trebaju biti javni.
+- **Auto-konverzija slika u WebP** — sve uploadane slike (logo, naslovnica
+  projekta, fasada, tlocrt kata/jedinice) se kroz `App\Support\ImageUploads`
+  (`intervention/image`) automatski pretvaraju u WebP i skaliraju na max
+  2000px širine prije spremanja. Manje datoteke, brže učitavanje, bolje za
+  SEO; usput riješava i "failed to upload" grešku koja se znala pojaviti
+  kod PNG screenshotova (pravi uzrok je bio `upload_max_filesize` u
+  `php.ini`, dokumentirano u README-u).

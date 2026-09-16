@@ -103,6 +103,72 @@ class PublicListingAndSeoTest extends TestCase
             ->assertDontSee('RI1');
     }
 
+    public function test_hidden_project_is_excluded_from_projects_index(): void
+    {
+        Project::factory()->create(['name' => 'Javni Projekt']);
+        Project::factory()->create(['name' => 'Interni Projekt', 'is_hidden' => true]);
+
+        $this->get(route('public.projects.index'))
+            ->assertOk()
+            ->assertSee('Javni Projekt')
+            ->assertDontSee('Interni Projekt');
+    }
+
+    public function test_hidden_project_page_returns_404(): void
+    {
+        $project = Project::factory()->create(['is_hidden' => true]);
+
+        $this->get(route('public.projects.show', $project))->assertNotFound();
+    }
+
+    public function test_hidden_project_building_and_unit_pages_return_404(): void
+    {
+        $project = Project::factory()->create(['is_hidden' => true]);
+        $building = Building::factory()->for($project)->create();
+        $unit = Unit::factory()->for($building, 'building')->create();
+
+        $this->get(route('public.buildings.show', $building))->assertNotFound();
+        $this->get(route('public.units.show', $unit))->assertNotFound();
+    }
+
+    public function test_units_of_hidden_project_are_excluded_from_units_index(): void
+    {
+        $hiddenProject = Project::factory()->create(['is_hidden' => true]);
+        $hiddenBuilding = Building::factory()->for($hiddenProject)->create();
+        Unit::factory()->for($hiddenBuilding, 'building')->create(['code' => 'SKRIVENA']);
+
+        $visibleBuilding = Building::factory()->create();
+        Unit::factory()->for($visibleBuilding, 'building')->create(['code' => 'JAVNA']);
+
+        $this->get(route('public.units.index'))
+            ->assertOk()
+            ->assertSee('JAVNA')
+            ->assertDontSee('SKRIVENA');
+    }
+
+    public function test_hidden_project_is_excluded_from_home_page_and_stats(): void
+    {
+        Project::factory()->create(['name' => 'Javni Projekt', 'is_featured' => true]);
+        Project::factory()->create(['name' => 'Interni Projekt', 'is_featured' => true, 'is_hidden' => true]);
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('Javni Projekt')
+            ->assertDontSee('Interni Projekt');
+    }
+
+    public function test_hidden_project_is_excluded_from_sitemap(): void
+    {
+        $visible = Project::factory()->create();
+        $hidden = Project::factory()->create(['is_hidden' => true]);
+
+        $response = $this->get(route('sitemap'));
+
+        $response->assertOk();
+        $response->assertSee(route('public.projects.show', $visible), false);
+        $response->assertDontSee(route('public.projects.show', $hidden), false);
+    }
+
     public function test_sitemap_lists_all_public_urls(): void
     {
         $project = Project::factory()->create();

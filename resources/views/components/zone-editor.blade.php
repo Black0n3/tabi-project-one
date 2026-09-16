@@ -215,10 +215,15 @@
                         }
 
                         if (this.drawing) {
-                            html += `<polyline points="${this.toSvgPoints(this.newPoints)}" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4"></polyline>`;
-                            this.newPoints.forEach(p => {
+                            const canClose = this.newPoints.length >= 3;
+                            const previewPoints = canClose ? [...this.newPoints, this.newPoints[0]] : this.newPoints;
+                            html += `<polyline points="${this.toSvgPoints(previewPoints)}" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4"></polyline>`;
+                            this.newPoints.forEach((p, index) => {
                                 const px = this.toPx(p);
-                                html += `<circle cx="${px[0]}" cy="${px[1]}" r="4" fill="#f59e0b"></circle>`;
+                                const isStart = canClose && index === 0;
+                                html += isStart
+                                    ? `<circle cx="${px[0]}" cy="${px[1]}" r="8" fill="#f59e0b" stroke="white" stroke-width="2" style="cursor:pointer;"></circle>`
+                                    : `<circle cx="${px[0]}" cy="${px[1]}" r="4" fill="#f59e0b"></circle>`;
                             });
                         }
 
@@ -255,7 +260,16 @@
                         if (this.draggingIndex !== null) return;
 
                         if (this.drawing) {
-                            this.newPoints.push(this.posFromEvent(e));
+                            const point = this.posFromEvent(e);
+
+                            // Clicking back near the starting point closes the shape
+                            // instead of adding a stray extra vertex there -- the
+                            // closing edge is already drawn in the preview and on save.
+                            if (this.newPoints.length >= 3 && this.isNearPoint(point, this.newPoints[0])) {
+                                return;
+                            }
+
+                            this.newPoints.push(point);
                             return;
                         }
 
@@ -264,6 +278,14 @@
                             const zone = this.zones.find(z => z.id === parseInt(zoneEl.dataset.zoneId));
                             if (zone) this.selectZone(zone);
                         }
+                    },
+
+                    // Distance check in screen pixels (not raw percentage points) so the
+                    // "click to close" tolerance stays consistent regardless of image size.
+                    isNearPoint(a, b, toleranceInPx = 12) {
+                        const [ax, ay] = this.toPx(a);
+                        const [bx, by] = this.toPx(b);
+                        return Math.hypot(ax - bx, ay - by) <= toleranceInPx;
                     },
 
                     onSvgMouseDown(e) {

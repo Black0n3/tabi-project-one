@@ -8,7 +8,12 @@ checklist, ne punopravni infra-as-code setup — prilagodi konkretnom hostingu
 
 - PHP 8.3+ (`composer.json` traži `^8.3`) s ekstenzijama: `pdo_mysql` (ili
   `pdo_sqlite` ako ipak ostaješ na SQLite-u), `mbstring`, `xml`, `curl`,
-  `fileinfo`, `zip`, `gd` ili `intl` po potrebi
+  `fileinfo`, `zip`, `intl` po potrebi, i **`gd` s WebP podrškom** (obavezno
+  -- `intervention/image` konvertira sve uploadane slike u WebP; provjeri
+  s `php -r "print_r(gd_info());"` da `WebP Support` piše `1`)
+- `upload_max_filesize` i `post_max_size` u `php.ini` podignuti na barem
+  `20M` (default je često `2M`/`8M`, premalo za PNG screenshotove prije
+  nego ih aplikacija stigne konvertirati u WebP)
 - Composer 2.x
 - Node `^20.19.0` ili `>=22.12.0` (`package.json` → `"engines"`; Vite 8
   zahtijeva ovu granicu, starija verzija puca s `node:util styleText`

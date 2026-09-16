@@ -7,6 +7,7 @@ use App\Enums\UnitType;
 use App\Livewire\Concerns\ResolvesPanelContext;
 use App\Models\Building;
 use App\Models\Unit;
+use App\Support\ImageUploads;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -74,7 +75,7 @@ class Form extends Component
             'floor_id' => ['nullable', Rule::exists('floors', 'id')->where('building_id', $this->building->id)],
             'description' => ['nullable', 'string'],
             'is_featured' => ['boolean'],
-            'floor_plan_image' => ['nullable', 'image', 'max:4096'],
+            'floor_plan_image' => ['nullable', 'image', 'max:8192'],
         ];
     }
 
@@ -87,7 +88,7 @@ class Form extends Component
         $unit->fill($validated);
 
         if ($this->floor_plan_image) {
-            $unit->floor_plan_image = $this->floor_plan_image->store('units/plans', 'public');
+            $unit->floor_plan_image = ImageUploads::storeAsWebp($this->floor_plan_image, 'units/plans');
         }
 
         $unit->save();
