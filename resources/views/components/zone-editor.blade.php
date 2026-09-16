@@ -31,6 +31,7 @@
                     class="absolute inset-0 w-full h-full"
                     :style="drawing ? 'cursor: crosshair;' : 'cursor: default;'"
                     @click="onSvgClick($event)"
+                    @dblclick="onSvgDblClick($event)"
                     @mousedown="onSvgMouseDown($event)"
                     @mousemove="onDrag($event)"
                     @mouseup="stopDrag()"
@@ -93,7 +94,10 @@
                 <template x-if="selectedZoneId && !drawing">
                     <div class="space-y-3">
                         <p class="text-sm font-medium text-gray-800 dark:text-gray-200" x-text="selectedZone()?.label"></p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Povuci točke po slici da promijeniš oblik.') }}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                            {{ __('Povuci točku da je pomakneš, klikni na rub oblika da dodaš novu točku, dvoklikni na točku da je ukloniš.') }}
+                            <span x-text="editPoints.length"></span> {{ __('točaka.') }}
+                        </p>
 
                         <div class="flex flex-wrap gap-2">
                             <button type="button" @click="saveEdited()" class="inline-flex items-center px-3 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500">
@@ -142,6 +146,7 @@
                     selectedZoneId: null,
                     editPoints: [],
                     draggingIndex: null,
+                    didDrag: false,
                     imgW: 0,
                     imgH: 0,
 
@@ -259,6 +264,14 @@
                     onSvgClick(e) {
                         if (this.draggingIndex !== null) return;
 
+                        // A click fires right after mouseup, even when that mouseup
+                        // ended a drag -- ignore it so releasing a dragged vertex
+                        // doesn't also insert/select something under the cursor.
+                        if (this.didDrag) {
+                            this.didDrag = false;
+                            return;
+                        }
+
                         if (this.drawing) {
                             const point = this.posFromEvent(e);
 
@@ -273,6 +286,15 @@
                             return;
                         }
 
+                        if (this.selectedZoneId) {
+                            // Clicking directly on a vertex is for dragging (or
+                            // double-click to remove), not for inserting a new point.
+                            if (e.target.closest('[data-vertex-index]')) return;
+
+                            this.insertPointOnNearestEdge(this.posFromEvent(e));
+                            return;
+                        }
+
                         const zoneEl = e.target.closest('[data-zone-id]');
                         if (zoneEl) {
                             const zone = this.zones.find(z => z.id === parseInt(zoneEl.dataset.zoneId));
@@ -280,18 +302,66 @@
                         }
                     },
 
+                    onSvgDblClick(e) {
+                        if (!this.selectedZoneId) return;
+
+                        const vertexEl = e.target.closest('[data-vertex-index]');
+                        if (!vertexEl) return;
+
+                        // A shape needs at least 3 points to stay a valid polygon --
+                        // delete the whole zone instead if you need fewer.
+                        if (this.editPoints.length <= 3) return;
+
+                        this.editPoints.splice(parseInt(vertexEl.dataset.vertexIndex), 1);
+                    },
+
                     // Distance check in screen pixels (not raw percentage points) so the
-                    // "click to close" tolerance stays consistent regardless of image size.
+                    // "click to close"/"click to insert" tolerance stays consistent
+                    // regardless of image size.
                     isNearPoint(a, b, toleranceInPx = 12) {
                         const [ax, ay] = this.toPx(a);
                         const [bx, by] = this.toPx(b);
                         return Math.hypot(ax - bx, ay - by) <= toleranceInPx;
                     },
 
+                    distanceToSegment(p, a, b) {
+                        const [px, py] = p, [ax, ay] = a, [bx, by] = b;
+                        const dx = bx - ax, dy = by - ay;
+                        const lengthSq = dx * dx + dy * dy;
+                        let t = lengthSq === 0 ? 0 : ((px - ax) * dx + (py - ay) * dy) / lengthSq;
+                        t = Math.max(0, Math.min(1, t));
+                        return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
+                    },
+
+                    // Inserts a new vertex right after whichever edge of the currently
+                    // edited shape the click landed closest to (within tolerance), so
+                    // clicking on the shape's outline adds a point there rather than
+                    // requiring the whole zone to be redrawn from scratch.
+                    insertPointOnNearestEdge(point) {
+                        const px = this.toPx(point);
+                        let bestIndex = -1;
+                        let bestDistance = Infinity;
+
+                        for (let i = 0; i < this.editPoints.length; i++) {
+                            const a = this.toPx(this.editPoints[i]);
+                            const b = this.toPx(this.editPoints[(i + 1) % this.editPoints.length]);
+                            const distance = this.distanceToSegment(px, a, b);
+                            if (distance < bestDistance) {
+                                bestDistance = distance;
+                                bestIndex = i;
+                            }
+                        }
+
+                        if (bestIndex === -1 || bestDistance > 14) return;
+
+                        this.editPoints.splice(bestIndex + 1, 0, point);
+                    },
+
                     onSvgMouseDown(e) {
                         const vertexEl = e.target.closest('[data-vertex-index]');
                         if (vertexEl) {
                             this.draggingIndex = parseInt(vertexEl.dataset.vertexIndex);
+                            this.didDrag = false;
                         }
                     },
 
@@ -333,6 +403,7 @@
 
                     onDrag(e) {
                         if (this.draggingIndex === null) return;
+                        this.didDrag = true;
                         this.editPoints[this.draggingIndex] = this.posFromEvent(e);
                     },
 
