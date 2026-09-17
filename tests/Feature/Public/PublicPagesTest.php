@@ -59,6 +59,28 @@ class PublicPagesTest extends TestCase
             ->assertSee('B5');
     }
 
+    public function test_building_page_includes_floor_plan_image_and_unit_polygon_for_hover_hotspots(): void
+    {
+        $building = Building::factory()->create();
+        $floor = Floor::factory()->for($building)->create(['floor_plan_image' => 'floors/plans/test.webp']);
+        Unit::factory()->for($building)->create([
+            'floor_id' => $floor->id,
+            'code' => 'B1',
+            'polygon' => [[10, 10], [40, 10], [40, 40], [10, 40]],
+        ]);
+
+        $response = $this->get(route('public.buildings.show', $building));
+
+        // The floor/unit data is passed to Alpine as a JSON string inside an HTML
+        // attribute (@js(...) -> JSON.parse('...')), so quotes come out as the
+        // literal 6-character escape sequence " -- assert on that exact
+        // fragment rather than plain JSON syntax.
+        $response->assertOk();
+        $response->assertSee('test.webp', false);
+        $response->assertSee('\\u0022code\\u0022:\\u0022B1\\u0022', false);
+        $response->assertSee('points\\u0022:[[10,10],[40,10],[40,40],[10,40]]', false);
+    }
+
     public function test_building_page_lists_units_without_a_floor_separately(): void
     {
         $building = Building::factory()->create();

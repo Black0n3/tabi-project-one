@@ -38,6 +38,7 @@ class BuildingPage extends Component
                 'id' => $floor->id,
                 'label' => $floor->label,
                 'points' => $floor->polygon,
+                'planUrl' => $floor->floor_plan_image ? Storage::disk('public')->url($floor->floor_plan_image) : null,
                 'units' => $floor->units->map(fn ($unit) => [
                     'id' => $unit->id,
                     'code' => $unit->code,
@@ -46,6 +47,7 @@ class BuildingPage extends Component
                     'status' => $unit->status->value,
                     'statusLabel' => $unit->status->label(),
                     'url' => route('public.units.show', $unit),
+                    'points' => $unit->polygon,
                 ]),
             ]),
             'unassignedUnits' => $unassignedUnits,
