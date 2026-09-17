@@ -41,6 +41,7 @@ class HomePage extends Component
         return view('livewire.public.home-page', [
             'projects' => $projects,
             'units' => $units,
+            'searchProjects' => Project::query()->visible()->orderBy('name')->get(['id', 'name']),
             'heroImage' => $heroImage ? Storage::disk('public')->url($heroImage) : null,
             'stats' => [
                 'projects' => Project::query()->visible()->count(),

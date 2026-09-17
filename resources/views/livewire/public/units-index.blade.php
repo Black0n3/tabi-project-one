@@ -6,8 +6,15 @@
 
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
         <div class="rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 shadow-sm p-4 sm:p-5">
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                <x-text-input wire:model.live.debounce.300ms="location" type="search" class="col-span-2 sm:col-span-1" placeholder="{{ __('Lokacija') }}" />
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                <x-text-input wire:model.live.debounce.300ms="location" type="search" placeholder="{{ __('Lokacija') }}" />
+
+                <select wire:model.live="projectId" class="border-stone-300 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-300 rounded-md shadow-sm text-sm focus:ring-emerald-600 focus:border-emerald-600">
+                    <option value="">{{ __('Svi projekti') }}</option>
+                    @foreach ($projects as $project)
+                        <option value="{{ $project->id }}">{{ $project->name }}</option>
+                    @endforeach
+                </select>
 
                 <select wire:model.live="status" class="border-stone-300 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-300 rounded-md shadow-sm text-sm focus:ring-emerald-600 focus:border-emerald-600">
                     <option value="">{{ __('Svi statusi') }}</option>
@@ -21,6 +28,14 @@
                     @foreach ($types as $option)
                         <option value="{{ $option->value }}">{{ $option->label() }}</option>
                     @endforeach
+                </select>
+
+                <select wire:model.live="roomCount" class="border-stone-300 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-300 rounded-md shadow-sm text-sm focus:ring-emerald-600 focus:border-emerald-600">
+                    <option value="">{{ __('Sobnost') }}</option>
+                    <option value="1">{{ __('1-sobni') }}</option>
+                    <option value="2">{{ __('2-sobni') }}</option>
+                    <option value="3">{{ __('3-sobni') }}</option>
+                    <option value="4+">{{ __('4+ sobni') }}</option>
                 </select>
 
                 <x-text-input wire:model.live.debounce.300ms="minArea" type="number" min="0" placeholder="{{ __('Min m²') }}" />

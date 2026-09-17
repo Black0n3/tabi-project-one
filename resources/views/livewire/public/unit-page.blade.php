@@ -15,6 +15,10 @@
             <span>{{ $unit->type->label() }}</span>
             <span class="text-emerald-300/50">&middot;</span>
             <span>{{ $unit->area_m2 }} m²</span>
+            @if ($unit->room_count)
+                <span class="text-emerald-300/50">&middot;</span>
+                <span>{{ trans_choice('{1}:count soba|[2,4]:count sobe|[5,*]:count soba', $unit->room_count, ['count' => $unit->room_count]) }}</span>
+            @endif
             @if ($unit->floor)
                 <span class="text-emerald-300/50">&middot;</span>
                 <span>{{ $unit->floor->label }}</span>

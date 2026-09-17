@@ -1,33 +1,59 @@
 <div>
-    <section class="relative overflow-hidden bg-gradient-to-br from-emerald-950 via-emerald-900 to-emerald-800 text-white">
+    <section class="relative overflow-hidden bg-gradient-to-br from-slate-950 via-emerald-950 to-emerald-900 text-white">
         @if ($heroImage)
-            <img src="{{ $heroImage }}" class="absolute inset-0 w-full h-full object-cover" alt="" aria-hidden="true">
-            <div class="absolute inset-0 bg-emerald-950/80"></div>
-            <div class="absolute inset-0 bg-gradient-to-br from-emerald-950 via-emerald-950/75 to-emerald-900/70"></div>
+            <div class="absolute inset-0 overflow-hidden">
+                <img src="{{ $heroImage }}" class="w-full h-full object-cover scale-110 blur-md saturate-[1.15]" alt="" aria-hidden="true">
+            </div>
+            <div class="absolute inset-0 bg-slate-950/70"></div>
+            <div class="absolute inset-0 bg-gradient-to-br from-emerald-950/90 via-emerald-950/75 to-slate-950/70"></div>
         @endif
 
-        <div class="absolute inset-0 opacity-[0.07]" style="background-image: repeating-linear-gradient(45deg, white 0, white 1px, transparent 1px, transparent 26px), repeating-linear-gradient(-45deg, white 0, white 1px, transparent 1px, transparent 26px);"></div>
+        <div class="absolute inset-0 opacity-[0.06]" style="background-image: repeating-linear-gradient(45deg, white 0, white 1px, transparent 1px, transparent 26px), repeating-linear-gradient(-45deg, white 0, white 1px, transparent 1px, transparent 26px);"></div>
         <div class="absolute inset-0" style="background-image: radial-gradient(circle at 15% 15%, rgba(255,255,255,0.10), transparent 45%), radial-gradient(circle at 85% 85%, rgba(255,255,255,0.06), transparent 40%);"></div>
 
-        <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-24 sm:pt-32 sm:pb-32">
-            <p class="text-sm font-medium tracking-widest text-emerald-300 uppercase mb-5">{{ __('Stambeni projekti · na jednom mjestu') }}</p>
+        <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16 sm:pt-32 sm:pb-20">
+            <p class="text-sm font-medium tracking-widest text-emerald-300 uppercase mb-5">{{ __('Novogradnja · Osijek i Slavonija') }}</p>
             <h1 class="font-display text-4xl sm:text-6xl font-semibold leading-[1.08] max-w-2xl text-white">
                 {{ __('Pronađi svoj novi dom') }}
             </h1>
             <p class="mt-6 max-w-xl text-lg text-emerald-100/80 leading-relaxed">
-                {{ __('Istraži stambene projekte, prošetaj kroz zgradu kat po kat i pronađi jedinicu koja ti odgovara.') }}
+                {{ __('Pretraži zgrade kat po kat, otvori tlocrt svakog stana i pronađi jedinicu koja ti odgovara.') }}
             </p>
 
-            <div class="mt-10 flex flex-wrap gap-3">
-                <a href="{{ route('public.units.index') }}" wire:navigate class="inline-flex items-center px-6 py-3 rounded-full bg-white text-emerald-950 font-medium hover:bg-emerald-50 transition shadow-lg shadow-emerald-950/30">
-                    {{ __('Pregledaj jedinice') }}
-                </a>
-                <a href="{{ route('public.projects.index') }}" wire:navigate class="inline-flex items-center px-6 py-3 rounded-full border border-white/30 text-white font-medium hover:bg-white/10 transition">
-                    {{ __('Svi projekti') }}
-                </a>
-            </div>
+            {{-- Quick search: glassmorphism traka, submit gradi query string i navigira preko Livewire.navigate --}}
+            <form
+                x-data="heroSearch()"
+                @submit.prevent="submit()"
+                class="mt-10 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl shadow-emerald-950/40 p-3 sm:p-3.5 max-w-3xl"
+            >
+                <div class="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-2.5">
+                    <select x-model="projectId" class="rounded-xl border-0 bg-white/95 text-stone-900 text-sm shadow-sm focus:ring-2 focus:ring-emerald-400 py-3">
+                        <option value="">{{ __('Svi projekti') }}</option>
+                        @foreach ($searchProjects as $project)
+                            <option value="{{ $project->id }}">{{ $project->name }}</option>
+                        @endforeach
+                    </select>
 
-            <dl class="mt-16 sm:mt-20 grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-8 max-w-2xl">
+                    <select x-model="roomCount" class="rounded-xl border-0 bg-white/95 text-stone-900 text-sm shadow-sm focus:ring-2 focus:ring-emerald-400 py-3">
+                        <option value="">{{ __('Sobnost') }}</option>
+                        <option value="1">{{ __('1-sobni') }}</option>
+                        <option value="2">{{ __('2-sobni') }}</option>
+                        <option value="3">{{ __('3-sobni') }}</option>
+                        <option value="4+">{{ __('4+ sobni') }}</option>
+                    </select>
+
+                    <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-semibold text-sm px-5 py-3 transition shadow-lg shadow-emerald-950/30">
+                        <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4 shrink-0"><path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" /></svg>
+                        {{ __('Pretraži stanove') }}
+                    </button>
+                </div>
+            </form>
+
+            <a href="{{ route('public.projects.index') }}" wire:navigate class="mt-4 inline-flex items-center text-sm font-medium text-emerald-200/80 hover:text-white transition">
+                {{ __('ili pregledaj sve projekte') }} →
+            </a>
+
+            <dl class="mt-14 sm:mt-16 grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-8 max-w-2xl">
                 <div>
                     <dt class="font-display text-3xl sm:text-4xl font-semibold">{{ $stats['projects'] }}</dt>
                     <dd class="text-sm text-emerald-200/70 mt-1">{{ __('projekata') }}</dd>
@@ -45,6 +71,39 @@
                     <dd class="text-sm text-emerald-200/70 mt-1">{{ __('lokacija') }}</dd>
                 </div>
             </dl>
+
+            @if ($projects->isNotEmpty())
+                <div class="mt-14 sm:mt-16">
+                    <p class="text-xs font-semibold uppercase tracking-widest text-emerald-300/80 mb-4">{{ __('Izbor urednika') }}</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        @foreach ($projects->take(3) as $index => $project)
+                            <a
+                                href="{{ route('public.projects.show', $project) }}"
+                                wire:navigate
+                                class="group relative overflow-hidden rounded-2xl border border-white/15 bg-white/5 hover:bg-white/10 transition-colors {{ $index === 0 ? 'sm:col-span-2 sm:row-span-2' : '' }}"
+                            >
+                                <div class="{{ $index === 0 ? 'aspect-[16/10]' : 'aspect-[16/9] sm:aspect-auto sm:h-full' }} relative">
+                                    @if ($project->cover_image)
+                                        <img src="{{ Storage::disk('public')->url($project->cover_image) }}" loading="lazy" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="{{ $project->name }}">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent"></div>
+                                    @else
+                                        <div class="absolute inset-0 bg-gradient-to-br from-emerald-900 to-slate-900"></div>
+                                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
+                                    @endif
+
+                                    <div class="absolute inset-x-0 bottom-0 p-4 sm:p-5">
+                                        <h3 class="font-display font-semibold text-white {{ $index === 0 ? 'text-xl sm:text-2xl' : 'text-base' }}">{{ $project->name }}</h3>
+                                        <p class="mt-1 text-sm text-emerald-100/80">
+                                            {{ trans_choice('{1}:count zgrada|[2,4]:count zgrade|[5,*]:count zgrada', $project->buildings_count, ['count' => $project->buildings_count]) }}
+                                            &middot; {{ __('interaktivni tlocrti') }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
         </div>
 
         <svg class="relative block w-full h-10 sm:h-14 text-stone-50 dark:text-stone-950" viewBox="0 0 1440 48" preserveAspectRatio="none" fill="currentColor">
@@ -128,3 +187,25 @@
         @endif
     </section>
 </div>
+
+@once
+    @push('scripts')
+        <script>
+            function heroSearch() {
+                return {
+                    projectId: '',
+                    roomCount: '',
+
+                    submit() {
+                        const params = new URLSearchParams();
+                        if (this.projectId) params.set('projekt', this.projectId);
+                        if (this.roomCount) params.set('sobe', this.roomCount);
+
+                        const query = params.toString();
+                        window.Livewire.navigate('{{ route('public.units.index') }}' + (query ? '?' + query : ''));
+                    },
+                };
+            }
+        </script>
+    @endpush
+@endonce

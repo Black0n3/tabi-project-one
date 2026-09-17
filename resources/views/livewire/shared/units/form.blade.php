@@ -25,11 +25,17 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div>
                 <x-input-label for="area_m2" :value="__('Površina (m²)')" />
                 <x-text-input wire:model="area_m2" id="area_m2" class="block mt-1 w-full" type="number" step="0.01" min="0" required />
                 <x-input-error :messages="$errors->get('area_m2')" class="mt-2" />
+            </div>
+
+            <div>
+                <x-input-label for="room_count" :value="__('Broj soba')" />
+                <x-text-input wire:model="room_count" id="room_count" class="block mt-1 w-full" type="number" step="1" min="1" max="20" />
+                <x-input-error :messages="$errors->get('room_count')" class="mt-2" />
             </div>
 
             <div>

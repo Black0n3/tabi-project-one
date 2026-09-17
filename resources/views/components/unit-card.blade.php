@@ -17,7 +17,10 @@
 
     <div class="p-5">
         <h3 class="font-display font-semibold text-lg leading-snug text-stone-900 dark:text-stone-100">{{ $unit->building->project->name }}</h3>
-        <p class="mt-1 text-sm text-stone-500 dark:text-stone-400">{{ __('Jedinica') }} {{ $unit->code }} &middot; {{ $unit->area_m2 }} m²</p>
+        <p class="mt-1 text-sm text-stone-500 dark:text-stone-400">
+            {{ __('Jedinica') }} {{ $unit->code }} &middot; {{ $unit->area_m2 }} m²
+            @if ($unit->room_count) &middot; {{ trans_choice('{1}:count soba|[2,4]:count sobe|[5,*]:count soba', $unit->room_count, ['count' => $unit->room_count]) }} @endif
+        </p>
 
         @if ($unit->price)
             <p class="mt-3 font-display text-xl font-semibold text-emerald-900 dark:text-emerald-400">

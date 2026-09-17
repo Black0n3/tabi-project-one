@@ -4,6 +4,7 @@ namespace App\Livewire\Public;
 
 use App\Enums\UnitStatus;
 use App\Enums\UnitType;
+use App\Models\Project;
 use App\Models\Unit;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
@@ -23,6 +24,12 @@ class UnitsIndex extends Component
 
     #[Url(as: 'tip')]
     public string $type = '';
+
+    #[Url(as: 'projekt')]
+    public string $projectId = '';
+
+    #[Url(as: 'sobe')]
+    public string $roomCount = '';
 
     #[Url(as: 'min_m2')]
     public string $minArea = '';
@@ -48,6 +55,14 @@ class UnitsIndex extends Component
             ->with('building.project')
             ->when($this->status, fn ($query) => $query->where('status', $this->status))
             ->when($this->type, fn ($query) => $query->where('type', $this->type))
+            ->when($this->projectId !== '', fn ($query) => $query->whereHas(
+                'building.project', fn ($q) => $q->where('id', $this->projectId)
+            ))
+            ->when($this->roomCount !== '', function ($query) {
+                $this->roomCount === '4+'
+                    ? $query->where('room_count', '>=', 4)
+                    : $query->where('room_count', (int) $this->roomCount);
+            })
             ->when($this->minArea !== '', fn ($query) => $query->where('area_m2', '>=', (float) $this->minArea))
             ->when($this->maxArea !== '', fn ($query) => $query->where('area_m2', '<=', (float) $this->maxArea))
             ->when($this->minPrice !== '', fn ($query) => $query->where('price', '>=', (float) $this->minPrice))
@@ -63,6 +78,7 @@ class UnitsIndex extends Component
             'units' => $units,
             'statuses' => UnitStatus::cases(),
             'types' => UnitType::cases(),
+            'projects' => Project::query()->visible()->orderBy('name')->get(['id', 'name']),
         ])->layout('layouts.public', [
             'description' => 'Pregledaj sve dostupne stanove i kuće naših investitora.',
         ]);

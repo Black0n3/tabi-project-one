@@ -87,6 +87,41 @@ class PublicListingAndSeoTest extends TestCase
             ->assertDontSee('Skup');
     }
 
+    public function test_units_index_filters_by_room_count(): void
+    {
+        Unit::factory()->create(['code' => 'Jednosoban', 'room_count' => 1]);
+        Unit::factory()->create(['code' => 'Trosoban', 'room_count' => 3]);
+        Unit::factory()->create(['code' => 'Peterosoban', 'room_count' => 5]);
+
+        Livewire::test(UnitsIndex::class)
+            ->set('roomCount', '3')
+            ->assertSee('Trosoban')
+            ->assertDontSee('Jednosoban')
+            ->assertDontSee('Peterosoban');
+
+        Livewire::test(UnitsIndex::class)
+            ->set('roomCount', '4+')
+            ->assertSee('Peterosoban')
+            ->assertDontSee('Jednosoban')
+            ->assertDontSee('Trosoban');
+    }
+
+    public function test_units_index_filters_by_project(): void
+    {
+        $projectA = Project::factory()->create(['name' => 'Projekt A']);
+        $buildingA = Building::factory()->for($projectA)->create();
+        Unit::factory()->for($buildingA, 'building')->create(['code' => 'A1']);
+
+        $projectB = Project::factory()->create(['name' => 'Projekt B']);
+        $buildingB = Building::factory()->for($projectB)->create();
+        Unit::factory()->for($buildingB, 'building')->create(['code' => 'B1']);
+
+        Livewire::test(UnitsIndex::class)
+            ->set('projectId', (string) $projectA->id)
+            ->assertSee('A1')
+            ->assertDontSee('B1');
+    }
+
     public function test_units_index_filters_by_project_location(): void
     {
         $zagrebBuilding = Building::factory()->create();

@@ -22,7 +22,9 @@
                 ])>{{ $unit->status->label() }}</span>
             </h2>
             <p class="text-sm text-gray-500 dark:text-gray-400">
-                {{ $unit->type->label() }} &middot; {{ $unit->area_m2 }} m² &middot; {{ $unit->floor?->label ?? __('bez kata') }}
+                {{ $unit->type->label() }} &middot; {{ $unit->area_m2 }} m²
+                @if ($unit->room_count) &middot; {{ trans_choice('{1}:count soba|[2,4]:count sobe|[5,*]:count soba', $unit->room_count, ['count' => $unit->room_count]) }} @endif
+                &middot; {{ $unit->floor?->label ?? __('bez kata') }}
                 @if ($unit->price) &middot; {{ number_format((float) $unit->price, 0, ',', '.') }} € @endif
             </p>
         </div>

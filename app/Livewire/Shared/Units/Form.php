@@ -28,6 +28,8 @@ class Form extends Component
 
     public string $area_m2 = '';
 
+    public string $room_count = '';
+
     public string $price = '';
 
     public string $status = '';
@@ -53,6 +55,7 @@ class Form extends Component
             $this->code = $unit->code;
             $this->type = $unit->type->value;
             $this->area_m2 = (string) $unit->area_m2;
+            $this->room_count = (string) $unit->room_count;
             $this->price = (string) $unit->price;
             $this->status = $unit->status->value;
             $this->floor_id = $unit->floor_id;
@@ -70,6 +73,7 @@ class Form extends Component
             'code' => ['required', 'string', 'max:255'],
             'type' => ['required', 'string', 'in:'.implode(',', array_column(UnitType::cases(), 'value'))],
             'area_m2' => ['required', 'numeric', 'min:0'],
+            'room_count' => ['nullable', 'integer', 'min:1', 'max:20'],
             'price' => ['nullable', 'numeric', 'min:0'],
             'status' => ['required', 'string', 'in:'.implode(',', array_column(UnitStatus::cases(), 'value'))],
             'floor_id' => ['nullable', Rule::exists('floors', 'id')->where('building_id', $this->building->id)],
@@ -83,6 +87,7 @@ class Form extends Component
     {
         $validated = $this->validate();
         $validated['price'] = $validated['price'] ?: null;
+        $validated['room_count'] = $validated['room_count'] ?: null;
 
         $unit = $this->unit ?? new Unit(['building_id' => $this->building->id]);
         $unit->fill($validated);
