@@ -31,8 +31,12 @@ sudo apt install php8.4-cli php8.4-mbstring php8.4-xml php8.4-curl \
 ```
 
 (Ako već imaš PHP 8.4 iz nekog drugog izvora, provjeri samo da su ekstenzije
-`pdo_sqlite`, `mbstring`, `xml`, `curl`, `fileinfo`, `zip` uključene —
-`php -m | grep -E "sqlite|mbstring|xml|curl|fileinfo|zip"`.)
+`pdo_sqlite`, `mbstring`, `xml`, `curl`, `fileinfo`, `zip`, `gd` uključene —
+`php -m | grep -E "sqlite|mbstring|xml|curl|fileinfo|zip|^gd"`. **`gd` je
+obavezan** — bez njega upload bilo koje slike (logo, naslovnica, fasada,
+tlocrt) puca s `GD PHP extension must be installed to use this driver.`,
+jer `intervention/image` njime konvertira sve uploadane slike u WebP.
+Ako fali: `sudo apt install php8.4-gd` pa restartaj `php artisan serve`.)
 
 **Node**: Vite 8 (`package.json` → `"engines"`) traži Node `^20.19` ili
 `>=22.12`. Ubuntov `apt install nodejs` obično instalira stariju verziju

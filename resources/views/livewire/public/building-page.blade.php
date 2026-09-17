@@ -15,27 +15,48 @@
 
     <div
         class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16"
-        x-data="buildingViewer({ floors: @js($floorsData) })"
+        x-data="buildingViewer({ floors: @js($floorsData), hasFacade: @js((bool) $facadeUrl) })"
         x-init="init()"
     >
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
             <div class="relative inline-block rounded-2xl border border-stone-200 dark:border-stone-800 shadow-sm overflow-hidden bg-stone-100 dark:bg-stone-900 w-full">
-                @if ($facadeUrl)
-                    <img x-ref="image" src="{{ $facadeUrl }}" @load="updateRect" class="block w-full h-auto select-none" draggable="false" alt="{{ $building->name }}">
-                    <svg
-                        x-ref="svg"
-                        x-html="renderSvg()"
-                        class="absolute inset-0 w-full h-full"
-                        @mousemove="onMove($event)"
-                        @click="onClick($event)"
-                        style="cursor: pointer;"
-                    ></svg>
-                @else
+                {{-- Fasada (bira kat hoverom) -- sakriva se čim aktivni kat ima svoj tlocrt --}}
+                <template x-if="hasFacade">
+                    <div x-show="!showPlan()">
+                        <img x-ref="image" src="{{ $facadeUrl }}" @load="updateRect" class="block w-full h-auto select-none" draggable="false" alt="{{ $building->name }}">
+                        <svg
+                            x-ref="svg"
+                            x-html="renderSvg()"
+                            class="absolute inset-0 w-full h-full"
+                            @mousemove="onMove($event)"
+                            @click="onClick($event)"
+                            style="cursor: pointer;"
+                        ></svg>
+                    </div>
+                </template>
+
+                {{-- Tlocrt aktivnog kata (bira jedinicu hoverom) -- umjesto fasade dok god kat ima svoj tlocrt --}}
+                <template x-if="showPlan()">
+                    <div>
+                        <img x-ref="planImage" :src="active().planUrl" @load="updatePlanRect" class="block w-full h-auto select-none" draggable="false" :alt="active().label">
+                        <svg
+                            x-ref="planSvg"
+                            x-html="renderPlanSvg()"
+                            class="absolute inset-0 w-full h-full"
+                            @mousemove="onPlanMove($event)"
+                            @mouseleave="hoveredUnitId = null"
+                            @click="onPlanClick($event)"
+                            style="cursor: pointer;"
+                        ></svg>
+                    </div>
+                </template>
+
+                <template x-if="!hasFacade && !showPlan()">
                     <div class="aspect-[4/3] flex flex-col items-center justify-center gap-3 text-stone-400 dark:text-stone-600 text-sm p-8 text-center">
                         <x-building-placeholder-icon class="h-10 w-10" />
                         {{ __('Fasada objekta još nije dodana.') }}
                     </div>
-                @endif
+                </template>
             </div>
 
             <div>
@@ -58,22 +79,7 @@
                     <div>
                         <h2 class="font-display font-semibold text-xl mb-4" x-text="active().label"></h2>
 
-                        <template x-if="active().planUrl">
-                            <div class="relative inline-block rounded-2xl border border-stone-200 dark:border-stone-800 shadow-sm overflow-hidden bg-stone-100 dark:bg-stone-900 w-full mb-4">
-                                <img x-ref="planImage" :src="active().planUrl" @load="updatePlanRect" class="block w-full h-auto select-none" draggable="false" :alt="active().label">
-                                <svg
-                                    x-ref="planSvg"
-                                    x-html="renderPlanSvg()"
-                                    class="absolute inset-0 w-full h-full"
-                                    @mousemove="onPlanMove($event)"
-                                    @mouseleave="hoveredUnitId = null"
-                                    @click="onPlanClick($event)"
-                                    style="cursor: pointer;"
-                                ></svg>
-                            </div>
-                        </template>
-
-                        <p class="text-xs text-stone-500 dark:text-stone-400 mb-4" x-show="active().planUrl && unitsWithShape().length > 0">
+                        <p class="text-xs text-stone-500 dark:text-stone-400 mb-4" x-show="showPlan() && unitsWithShape().length > 0">
                             {{ __('Prijeđi mišem preko stana na tlocrtu (ili ga dodirni) za detalje.') }}
                         </p>
 
@@ -128,13 +134,14 @@
 @once
     @push('scripts')
         <script>
-            function buildingViewer({ floors }) {
+            function buildingViewer({ floors, hasFacade }) {
                 return {
                     floors: floors.map(f => ({
                         ...f,
                         points: f.points || [],
                         units: f.units.map(u => ({ ...u, points: u.points || [] })),
                     })),
+                    hasFacade,
                     activeId: null,
                     hoveredUnitId: null,
                     imgW: 0,
@@ -143,7 +150,6 @@
                     planH: 0,
 
                     init() {
-                        this.updateRect();
                         window.addEventListener('resize', () => {
                             this.updateRect();
                             this.updatePlanRect();
@@ -151,7 +157,14 @@
 
                         const withShape = this.floors.find(f => this.hasShape(f.points));
                         this.activeId = withShape ? withShape.id : (this.floors[0]?.id ?? null);
-                        this.$nextTick(() => this.updatePlanRect());
+                        this.$nextTick(() => {
+                            this.updateRect();
+                            this.updatePlanRect();
+                        });
+                    },
+
+                    showPlan() {
+                        return !!(this.active() && this.active().planUrl);
                     },
 
                     updateRect() {
@@ -193,7 +206,10 @@
                     select(id) {
                         this.activeId = id;
                         this.hoveredUnitId = null;
-                        this.$nextTick(() => this.updatePlanRect());
+                        this.$nextTick(() => {
+                            this.updateRect();
+                            this.updatePlanRect();
+                        });
                     },
 
                     active() {

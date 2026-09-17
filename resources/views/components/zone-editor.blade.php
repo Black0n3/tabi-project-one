@@ -33,9 +33,9 @@
                     @click="onSvgClick($event)"
                     @dblclick="onSvgDblClick($event)"
                     @mousedown="onSvgMouseDown($event)"
-                    @mousemove="onDrag($event)"
+                    @mousemove="onSvgMouseMove($event)"
                     @mouseup="stopDrag()"
-                    @mouseleave="stopDrag()"
+                    @mouseleave="stopDrag(); hoveredZoneId = null"
                 ></svg>
             </div>
 
@@ -117,7 +117,13 @@
                     <p class="text-xs font-semibold uppercase text-gray-400 dark:text-gray-500 mb-2">{{ __('Sve stavke') }}</p>
                     <ul class="space-y-1 text-sm">
                         <template x-for="zone in zones" :key="'list-'+zone.id">
-                            <li class="flex items-center justify-between gap-2">
+                            <li
+                                @mouseenter="hasShape(zone.points) && !selectedZoneId ? hoveredZoneId = zone.id : null"
+                                @mouseleave="hoveredZoneId = null"
+                                @click="hasShape(zone.points) && !drawing && !selectedZoneId ? selectZone(zone) : null"
+                                class="flex items-center justify-between gap-2 rounded-md px-2 py-1 -mx-2 transition-colors"
+                                :class="[hasShape(zone.points) ? 'cursor-pointer' : '', zone.id === hoveredZoneId ? 'bg-emerald-50 dark:bg-emerald-900/30' : '']"
+                            >
                                 <span x-text="zone.label" class="text-gray-700 dark:text-gray-300"></span>
                                 <span
                                     x-text="hasShape(zone.points) ? '{{ __('označeno') }}' : '{{ __('bez zone') }}'"
@@ -144,6 +150,7 @@
                     attachToId: '',
                     newLabel: '',
                     selectedZoneId: null,
+                    hoveredZoneId: null,
                     editPoints: [],
                     draggingIndex: null,
                     didDrag: false,
@@ -200,10 +207,11 @@
                         for (const zone of this.zones) {
                             if (!this.hasShape(zone.points) || zone.id === this.selectedZoneId) continue;
 
+                            const hovered = zone.id === this.hoveredZoneId;
                             const c = this.toPx(this.centroid(zone.points));
                             html += `<g>`
                                 + `<polygon data-zone-id="${zone.id}" points="${this.toSvgPoints(zone.points)}" `
-                                + `class="fill-emerald-500/25 stroke-emerald-600 hover:fill-emerald-500/40" stroke-width="2" style="cursor:pointer;"></polygon>`
+                                + `class="${hovered ? 'fill-emerald-500/45 stroke-emerald-500' : 'fill-emerald-500/25 stroke-emerald-600'}" stroke-width="2" style="cursor:pointer;"></polygon>`
                                 + `<text x="${c[0]}" y="${c[1]}" text-anchor="middle" class="fill-white text-xs font-semibold pointer-events-none" `
                                 + `style="paint-order: stroke; stroke: rgba(0,0,0,.6); stroke-width: 3px;">${this.escapeHtml(zone.label)}</text>`
                                 + `</g>`;
@@ -357,6 +365,21 @@
                         this.editPoints.splice(bestIndex + 1, 0, point);
                     },
 
+                    // Combines vertex-dragging (while editing a selected zone) with
+                    // hover detection on the default browse view, since an element can
+                    // only have one @mousemove handler.
+                    onSvgMouseMove(e) {
+                        if (this.draggingIndex !== null) {
+                            this.onDrag(e);
+                            return;
+                        }
+
+                        if (this.drawing || this.selectedZoneId) return;
+
+                        const zoneEl = e.target.closest('[data-zone-id]');
+                        this.hoveredZoneId = zoneEl ? parseInt(zoneEl.dataset.zoneId) : null;
+                    },
+
                     onSvgMouseDown(e) {
                         const vertexEl = e.target.closest('[data-vertex-index]');
                         if (vertexEl) {
@@ -389,6 +412,7 @@
                         if (this.drawing) return;
                         if (!this.hasShape(zone.points)) return;
                         this.selectedZoneId = zone.id;
+                        this.hoveredZoneId = null;
                         this.editPoints = zone.points.map(p => [...p]);
                     },
 
