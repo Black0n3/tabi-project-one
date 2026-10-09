@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['investor_id', 'name', 'description', 'location', 'status', 'cover_image', 'is_featured', 'is_hidden'])]
+#[Fillable(['investor_id', 'name', 'description', 'location', 'status', 'cover_image', 'gallery', 'is_featured', 'is_hidden'])]
 class Project extends Model
 {
     /** @use HasFactory<ProjectFactory> */
@@ -21,6 +21,7 @@ class Project extends Model
     {
         return [
             'status' => ProjectStatus::class,
+            'gallery' => 'array',
             'is_featured' => 'boolean',
             'is_hidden' => 'boolean',
         ];

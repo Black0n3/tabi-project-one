@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         User::factory()->create([
-            'name' => 'Demo Investitor',
+            'name' => 'TabarDI - Investitor',
             'email' => 'investitor@tabi.hr',
             'role' => UserRole::Investor,
         ]);

@@ -9,33 +9,94 @@ use App\Enums\UnitType;
 use App\Models\Building;
 use App\Models\Investor;
 use App\Models\Project;
-use App\Models\Room;
 use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
 
+/**
+ * Jedan investitor ("TabarDI - Investitor") i jedan projekt -- "Plješevička".
+ *
+ * Svi podaci (površine, prostorije, terase) i vizuali preuzeti su iz idejnog rješenja
+ * "Obiteljske zgrade P11 i P13" (A-Z Arhitektura, listopad 2023). Slike i poligoni
+ * zona (katovi na fasadi, stanovi na tlocrtu kata, prostorije u stanu) nalaze se u
+ * database/seeders/data/pljesevicka/ -- poligoni su u % dimenzija pripadajuće slike.
+ */
 class DemoDataSeeder extends Seeder
 {
-    protected array $locations = [
-        'Zagreb', 'Split', 'Rijeka', 'Osijek', 'Zadar', 'Pula', 'Varaždin', 'Dubrovnik',
-    ];
+    protected string $dataDir;
+
+    /** @var array{gallery: array, facades: array, plans: array} */
+    protected array $polygons;
 
     /**
-     * Seed jedan ručno posložen Investitor -> Projekt -> Objekat -> Kat -> Jedinica -> Prostorija
-     * "izlog" primjer (stabilan, uvijek isti podaci -- koristan za screenshotove/demo), plus
-     * dva dodatna investitora s nasumično generiranim podacima (4-6 projekata svaki) za
-     * realističnije testiranje pretrage, filtera i paginacije.
+     * Etaže ponavljaju se u obje zgrade (A = Plješevička 11, B = Plješevička 13).
+     *
+     * @var array<string, array<string, mixed>>
      */
+    protected array $levels = [
+        'pri' => [
+            'floor' => 'Prizemlje', 'order' => 0, 'number' => 1, 'facade' => 'Prizemlje',
+            'area' => 64.39, 'room_count' => 2,
+            'description' => 'Stan u prizemlju s dnevnim boravkom, kuhinjom i blagovanjem u jednom prostoru, spavaćom sobom i kupaonicom. Uz stan idu terasa i privatni vrt (ukupno 27,32 m² vanjskog prostora), a pristup vrtu stana 2 na 1. katu vodi vanjskim stubištem.',
+            'rooms' => [
+                '1' => ['Ulaz', 4.66],
+                '2' => ['Dnevni boravak + kuhinja + blagovanje', 34.78],
+                '3' => ['Hodnik', 2.75],
+                '4' => ['Kupaonica', 7.15],
+                '5' => ['Spavaća soba', 13.35],
+                '6' => ['Spremište', 1.70],
+            ],
+            'terraces' => [
+                ['Terasa T1 (nenatkriveno u vrtu)', 22.07],
+                ['Terasa T2 (nenatkriveno u vrtu)', 5.25],
+            ],
+        ],
+        'k1' => [
+            'floor' => '1. kat', 'order' => 1, 'number' => 2, 'facade' => 'I. kat',
+            'area' => 97.46, 'room_count' => 4,
+            'description' => 'Četverosobni stan na 1. katu s dnevnim boravkom i kuhinjom, spavaćom sobom, dvjema dječjim sobama i dvjema kupaonicama. Uz stan idu natkrivena lođa, terasa i vrtna terasa (ukupno 48,91 m² vanjskog prostora).',
+            'rooms' => [
+                '1' => ['Hodnik', 9.94],
+                '2' => ['Dnevni boravak + kuhinja', 39.10],
+                '3' => ['Kupaonica 1', 4.32],
+                '4' => ['Spremište', 1.67],
+                '5' => ['Dječja soba 2', 10.67],
+                '6' => ['Dječja soba 1', 10.67],
+                '7' => ['Spavaća soba', 16.56],
+                '8' => ['Kupaonica 2', 4.53],
+            ],
+            'terraces' => [
+                ['Terasa T1 (natkriveno)', 17.73],
+                ['Terasa T2 (nenatkriveno)', 14.70],
+                ['Terasa T3 (nenatkriveno u vrtu)', 16.48],
+            ],
+        ],
+        'k2' => [
+            'floor' => '2. kat', 'order' => 2, 'number' => 3, 'facade' => 'II. kat',
+            'area' => 87.22, 'room_count' => 3,
+            'description' => 'Trosoban stan na 2. katu s dnevnim boravkom i kuhinjom, spavaćom sobom, dječjom sobom i dvjema kupaonicama. Uz stan idu natkrivena lođa i terasa (ukupno 29,51 m² vanjskog prostora).',
+            'rooms' => [
+                '1' => ['Hodnik', 9.18],
+                '2' => ['Dnevni boravak + kuhinja', 39.11],
+                '3' => ['Kupaonica 1', 4.08],
+                '4' => ['Spremište', 1.55],
+                '5' => ['Dječja soba', 14.06],
+                '6' => ['Spavaća soba', 15.17],
+                '7' => ['Kupaonica 2', 4.07],
+            ],
+            'terraces' => [
+                ['Terasa T1 (natkriveno)', 17.75],
+                ['Terasa T2 (nenatkriveno)', 11.76],
+            ],
+        ],
+    ];
+
     public function run(): void
     {
-        $this->seedShowcaseInvestor();
+        $this->dataDir = __DIR__.'/data/pljesevicka';
+        $this->polygons = json_decode(file_get_contents($this->dataDir.'/polygons.json'), true);
 
-        $this->seedRandomInvestor('investitor2@tabi.hr', 'Jadranka Nekretnine d.o.o.');
-        $this->seedRandomInvestor('investitor3@tabi.hr', 'Kontinent Gradnja d.o.o.');
-    }
-
-    protected function seedShowcaseInvestor(): void
-    {
         $investorUser = User::where('email', 'investitor@tabi.hr')->first();
 
         if (! $investorUser) {
@@ -44,170 +105,92 @@ class DemoDataSeeder extends Seeder
 
         $investor = Investor::firstOrCreate(
             ['user_id' => $investorUser->id],
-            [
-                'company_name' => 'Sunčani Vrt d.o.o.',
-                'oib' => '12345678901',
-                'contact_phone' => '+385 1 234 5678',
-                'contact_email' => 'info@suncanivrt.hr',
-            ]
+            ['company_name' => 'TabarDI - Investitor']
         );
 
+        $this->seedPljesevicka($investor);
+    }
+
+    protected function seedPljesevicka(Investor $investor): void
+    {
         $project = $investor->projects()->create([
-            'name' => 'Rezidencija Sunčani Vrt',
-            'description' => 'Suvremeno naselje od tri zgrade s uređenim okolišem, u mirnom dijelu grada.',
-            'location' => 'Zagreb',
-            'status' => ProjectStatus::InProgress,
+            'name' => 'Plješevička',
+            'description' => "Dvije obiteljske zgrade (Plješevička ulica 11 i 13) u Osijeku, svaka s tri stana: stan u prizemlju s privatnim vrtom te stanovi na 1. i 2. katu s lođama i terasama. Projekt je u fazi idejnog rješenja (A-Z Arhitektura, listopad 2023.).\n\n"
+                ."Konstrukcija: nosivi zidovi od armiranog betona i ziđa od blok opeke, ploče od armiranog betona (polu-montažne). Pregradni zidovi su od pjenobetona, toplinska izolacija EPS/kamena vuna, a stolarija PVC/ALU s 3-slojnim staklima. Podno grijanje i hlađenje rješava toplinska dizalica zrak-voda, uz prirodnu ventilaciju i fotonaponsku elektranu od cca 11 kW. Za stanare su predviđena parkirna mjesta ispred zgrade.",
+            'location' => 'Osijek, Plješevička ulica',
+            'status' => ProjectStatus::Planned,
             'is_featured' => true,
+            'cover_image' => $this->copyAsset('cover.webp', 'projects/covers/pljesevicka-cover.webp'),
+            'gallery' => collect($this->polygons['gallery'])->map(fn (array $item) => [
+                'path' => $this->copyAsset($item['file'], 'projects/gallery/pljesevicka-'.$item['file']),
+                'caption' => $item['caption'],
+            ])->all(),
         ]);
 
-        $building = $project->buildings()->create([
-            'name' => 'Zgrada A',
-            'type' => BuildingType::Zgrada,
-            'address' => 'Sunčana ulica 1, Zagreb',
-        ]);
-
-        $floorsData = [
-            ['label' => 'Prizemlje', 'order' => 0],
-            ['label' => '1. kat', 'order' => 1],
-            ['label' => '2. kat', 'order' => 2],
-        ];
-
-        $unitsData = [
-            [
-                'code' => 'A1', 'area_m2' => 45.5, 'price' => 145000, 'status' => UnitStatus::Dostupno,
-                'is_featured' => true,
-                'description' => 'Jednosoban stan s balkonom, orijentacija jug.',
-                'rooms' => [
-                    ['name' => 'Dnevni boravak s kuhinjom', 'area_m2' => 24],
-                    ['name' => 'Spavaća soba', 'area_m2' => 13],
-                    ['name' => 'Kupaonica', 'area_m2' => 4.5],
-                    ['name' => 'Balkon', 'area_m2' => 4],
-                ],
-            ],
-            [
-                'code' => 'A2', 'area_m2' => 62, 'price' => 198000, 'status' => UnitStatus::Rezervirano,
-                'is_featured' => false,
-                'description' => 'Dvosoban stan s pogledom na park.',
-                'rooms' => [
-                    ['name' => 'Dnevni boravak s kuhinjom', 'area_m2' => 28],
-                    ['name' => 'Spavaća soba 1', 'area_m2' => 14],
-                    ['name' => 'Spavaća soba 2', 'area_m2' => 11],
-                    ['name' => 'Kupaonica', 'area_m2' => 5],
-                    ['name' => 'Balkon', 'area_m2' => 4],
-                ],
-            ],
-            [
-                'code' => 'A3', 'area_m2' => 78, 'price' => 245000, 'status' => UnitStatus::Prodano,
-                'is_featured' => false,
-                'description' => 'Trosoban stan na najvišem katu s krovnom terasom.',
-                'rooms' => [
-                    ['name' => 'Dnevni boravak s kuhinjom', 'area_m2' => 32],
-                    ['name' => 'Spavaća soba 1', 'area_m2' => 15],
-                    ['name' => 'Spavaća soba 2', 'area_m2' => 12],
-                    ['name' => 'Spavaća soba 3', 'area_m2' => 10],
-                    ['name' => 'Kupaonica', 'area_m2' => 6],
-                    ['name' => 'Terasa', 'area_m2' => 12],
-                ],
-            ],
-        ];
-
-        foreach ($floorsData as $index => $floorData) {
-            $floor = $building->floors()->create($floorData);
-
-            $unit = $unitsData[$index];
-            $rooms = $unit['rooms'];
-            unset($unit['rooms']);
-
-            $createdUnit = $floor->units()->create([
-                ...$unit,
-                'building_id' => $building->id,
-                'type' => UnitType::Stan,
+        foreach ([
+            ['house' => '11', 'suffix' => 'A', 'plan' => 'A'],
+            ['house' => '13', 'suffix' => 'B', 'plan' => 'B'],
+        ] as $def) {
+            $building = $project->buildings()->create([
+                'name' => 'Plješevička '.$def['house'],
+                'type' => BuildingType::Zgrada,
+                'address' => 'Plješevička ulica '.$def['house'].', Osijek',
+                'facade_image' => $this->copyAsset("facade-{$def['house']}.webp", "buildings/facades/pljesevicka-{$def['house']}.webp"),
             ]);
 
-            foreach ($rooms as $room) {
-                $createdUnit->rooms()->create($room);
+            foreach ($this->levels as $levelKey => $level) {
+                $this->seedFloor($building, $def, $levelKey, $level);
             }
         }
     }
 
-    protected function seedRandomInvestor(string $email, string $companyName): void
+    protected function seedFloor(Building $building, array $def, string $levelKey, array $level): void
     {
-        if (User::where('email', $email)->exists()) {
-            return;
-        }
+        $planName = $def['plan'].'_'.$levelKey;
+        $plan = $this->polygons['plans'][$planName];
+        $code = $level['number'].$def['suffix'];
 
-        $user = User::factory()->investor()->create([
-            'name' => $companyName,
-            'email' => $email,
+        $floor = $building->floors()->create([
+            'label' => $level['floor'],
+            'order' => $level['order'],
+            'polygon' => $this->polygons['facades'][$def['house']][$level['facade']],
+            'floor_plan_image' => $this->copyAsset("plan-{$planName}.webp", "floors/plans/pljesevicka-{$def['house']}-{$levelKey}.webp"),
         ]);
 
-        $investor = Investor::factory()->for($user, 'user')->create([
-            'company_name' => $companyName,
+        $unit = Unit::create([
+            'building_id' => $building->id,
+            'floor_id' => $floor->id,
+            'code' => $code,
+            'type' => UnitType::Stan,
+            'area_m2' => $level['area'],
+            'room_count' => $level['room_count'],
+            'status' => UnitStatus::Dostupno,
+            'description' => $level['description'],
+            'polygon' => $plan['unit'],
+            'floor_plan_image' => $this->copyAsset("plan-{$planName}.webp", "units/plans/pljesevicka-{$code}.webp"),
         ]);
 
-        Project::factory()
-            ->for($investor)
-            ->count(fake()->numberBetween(4, 6))
-            ->create()
-            ->each(fn (Project $project) => $this->seedProjectContent($project));
-    }
-
-    protected function seedProjectContent(Project $project): void
-    {
-        $project->forceFill(['location' => fake()->randomElement($this->locations)])->save();
-
-        Building::factory()
-            ->for($project)
-            ->count(fake()->numberBetween(1, 3))
-            ->create()
-            ->each(fn (Building $building) => $this->seedBuildingContent($building));
-    }
-
-    protected function seedBuildingContent(Building $building): void
-    {
-        if ($building->type === BuildingType::Kuca) {
-            $this->seedStandaloneUnits($building, fake()->numberBetween(1, 2), UnitType::Kuca);
-
-            return;
-        }
-
-        $floorLabels = ['Prizemlje', '1. kat', '2. kat', '3. kat'];
-        $floorCount = fake()->numberBetween(2, 4);
-
-        for ($order = 0; $order < $floorCount; $order++) {
-            $floor = $building->floors()->create([
-                'label' => $floorLabels[$order] ?? ($order.'. kat'),
-                'order' => $order,
+        foreach ($level['rooms'] as $label => [$name, $area]) {
+            $unit->rooms()->create([
+                'name' => $name,
+                'area_m2' => $area,
+                'polygon' => $plan['rooms'][$label] ?? null,
             ]);
-
-            $unitsOnFloor = fake()->numberBetween(1, 3);
-
-            Unit::factory()
-                ->for($building)
-                ->count($unitsOnFloor)
-                ->create(['floor_id' => $floor->id, 'type' => UnitType::Stan])
-                ->each(fn ($unit) => $this->seedRoomsFor($unit));
         }
 
-        if (fake()->boolean(25)) {
-            $this->seedStandaloneUnits($building, 1, UnitType::Stan);
+        foreach ($level['terraces'] as [$name, $area]) {
+            $unit->rooms()->create(['name' => $name, 'area_m2' => $area]);
         }
     }
 
-    protected function seedStandaloneUnits(Building $building, int $count, UnitType $type): void
+    /**
+     * Kopira sliku iz seed direktorija na javni disk (stabilna putanja, pa se ponovnim
+     * seedanjem samo prepisuje) i vraća relativnu putanju za bazu.
+     */
+    protected function copyAsset(string $file, string $target): string
     {
-        Unit::factory()
-            ->for($building)
-            ->count($count)
-            ->create(['floor_id' => null, 'type' => $type])
-            ->each(fn ($unit) => $this->seedRoomsFor($unit));
-    }
+        Storage::disk('public')->put($target, file_get_contents($this->dataDir.'/'.$file));
 
-    protected function seedRoomsFor(Unit $unit): void
-    {
-        Room::factory()
-            ->for($unit)
-            ->count(fake()->numberBetween(2, 4))
-            ->create();
+        return $target;
     }
 }
