@@ -15,6 +15,9 @@
 #    build output and the storage symlink must exist in BOTH places:
 #    once in public_html (what Apache actually serves) and once in
 #    $APP_DIR/public (what artisan/Vite's helpers read from disk).
+#  - The same unanchored-pattern trap applies to tar: --exclude='vendor'
+#    also drops resources/views/vendor (published package views). All tar
+#    excludes below are anchored with './'.
 #
 # Usage:  bash deploy/deploy.sh
 # Env overrides: SSH_HOST SSH_USER SSH_KEY APP_DIR WEB_DIR SITE_USER CF_ZONE CF_HOST CF_TOKEN_FILE
@@ -41,9 +44,10 @@ npm run build
 
 say "Packing working tree + build output"
 tar -czf /tmp/p1-src.tar.gz \
-  --exclude='.git' --exclude='vendor' --exclude='node_modules' --exclude='public/build' \
-  --exclude='.env' --exclude='storage/framework/views/*.php' \
-  --exclude='storage/logs/*' --exclude='.phpunit.result.cache' \
+  --exclude='./.git' --exclude='./.claude' --exclude='./vendor' --exclude='./node_modules' --exclude='./public/build' \
+  --exclude='./database/*.sqlite' \
+  --exclude='./.env' --exclude='./storage/framework/views/*.php' \
+  --exclude='./storage/logs/*' --exclude='./.phpunit.result.cache' \
   .
 tar -czf /tmp/p1-build.tar.gz -C public build
 
