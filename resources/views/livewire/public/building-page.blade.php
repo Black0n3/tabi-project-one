@@ -1,13 +1,12 @@
 <div>
     <x-page-hero :image="$facadeUrl">
-        <p class="text-sm text-emerald-300/90 mb-3">
-            <a href="{{ route('public.projects.show', $building->project) }}" wire:navigate class="hover:underline">{{ $building->project->name }}</a>
+        <p class="text-[13px] font-semibold text-ink-soft">
+            <a href="{{ route('public.projects.show', $building->project) }}" wire:navigate class="transition hover:text-ink">{{ $building->project->name }}</a>
         </p>
-        <h1 class="font-display text-3xl sm:text-5xl font-semibold leading-tight">{{ $building->name }}</h1>
-        <p class="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-emerald-100/80">
-            <span class="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-sm font-medium">{{ $building->type->label() }}</span>
+        <h1 class="mt-3.5 font-display text-4xl sm:text-[46px] font-medium leading-tight text-ink">{{ $building->name }}</h1>
+        <p class="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-ink-soft">
+            <span class="inline-flex items-center rounded-full border border-line-strong bg-white/[0.08] px-3.5 py-1.5 text-[12.5px] font-semibold text-ink">{{ $building->type->label() }}</span>
             @if ($building->address)
-                <span class="text-emerald-300/50">&middot;</span>
                 <span>{{ $building->address }}</span>
             @endif
         </p>
@@ -19,7 +18,7 @@
         x-init="init()"
     >
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-            <div class="relative inline-block rounded-2xl border border-stone-200 dark:border-stone-800 shadow-sm overflow-hidden bg-stone-100 dark:bg-stone-900 w-full">
+            <div class="relative inline-block rounded-[22px] border border-line-strong shadow-2xl shadow-black/50 overflow-hidden bg-canvas-raised w-full">
                 {{-- Fasada (bira kat hoverom) -- sakriva se čim aktivni kat ima svoj tlocrt --}}
                 <template x-if="hasFacade">
                     <div x-show="!showPlan()">
@@ -30,7 +29,7 @@
                             class="absolute inset-0 w-full h-full"
                             @mousemove="onMove($event)"
                             @click="onClick($event)"
-                            style="cursor: pointer;"
+                            style="cursor: pointer; filter: drop-shadow(0 0 1px rgba(0,0,0,.85));"
                         ></svg>
                     </div>
                 </template>
@@ -46,13 +45,13 @@
                             @mousemove="onPlanMove($event)"
                             @mouseleave="hoveredUnitId = null"
                             @click="onPlanClick($event)"
-                            style="cursor: pointer;"
+                            style="cursor: pointer; filter: drop-shadow(0 0 1px rgba(0,0,0,.85));"
                         ></svg>
                     </div>
                 </template>
 
                 <template x-if="!hasFacade && !showPlan()">
-                    <div class="aspect-[4/3] flex flex-col items-center justify-center gap-3 text-stone-400 dark:text-stone-600 text-sm p-8 text-center">
+                    <div class="aspect-[4/3] flex flex-col items-center justify-center gap-3 text-ink-faint text-sm p-8 text-center">
                         <x-building-placeholder-icon class="h-10 w-10" />
                         {{ __('Fasada objekta još nije dodana.') }}
                     </div>
@@ -67,8 +66,8 @@
                                 type="button"
                                 @mouseenter="select(floor.id)"
                                 @click="select(floor.id)"
-                                :class="floor.id === activeId ? 'bg-emerald-900 dark:bg-emerald-800 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700'"
-                                class="px-3.5 py-1.5 rounded-full text-sm font-medium transition"
+                                :class="floor.id === activeId ? 'bg-ink text-canvas font-bold' : 'bg-panel text-ink-soft hover:bg-white/10 font-semibold'"
+                                class="px-[18px] py-2 rounded-full text-[13.5px] transition"
                                 x-text="floor.label"
                             ></button>
                         </template>
@@ -77,25 +76,25 @@
 
                 <template x-if="active()">
                     <div>
-                        <h2 class="font-display font-semibold text-xl mb-4" x-text="active().label"></h2>
+                        <h2 class="font-display font-semibold text-[22px] mb-4 text-ink" x-text="active().label"></h2>
 
-                        <p class="text-xs text-stone-500 dark:text-stone-400 mb-4" x-show="showPlan() && unitsWithShape().length > 0">
+                        <p class="text-xs text-ink-faint mb-4" x-show="showPlan() && unitsWithShape().length > 0">
                             {{ __('Prijeđi mišem preko stana na tlocrtu (ili ga dodirni) za detalje.') }}
                         </p>
 
                         <div class="space-y-2.5" x-show="active().units.length > 0">
                             <template x-for="unit in active().units" :key="unit.id">
-                                <a :href="unit.url" wire:navigate class="flex items-center justify-between gap-3 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 px-5 py-4 hover:border-emerald-300 dark:hover:border-emerald-700 hover:shadow-md transition">
+                                <a :href="unit.url" wire:navigate class="flex items-center justify-between gap-3 rounded-2xl border border-line bg-canvas-raised px-5 py-4 transition hover:-translate-y-0.5 hover:border-white/30">
                                     <div>
-                                        <span class="font-display font-medium text-stone-900 dark:text-stone-100" x-text="unit.code"></span>
-                                        <span class="text-sm text-stone-500 dark:text-stone-400" x-text="' · ' + unit.area + ' m²'"></span>
+                                        <span class="font-display font-semibold text-base text-ink" x-text="unit.code"></span>
+                                        <span class="text-[13px] text-ink-faint" x-text="' · ' + unit.area + ' m²'"></span>
                                     </div>
                                     <span
-                                        class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium shrink-0"
+                                        class="inline-flex items-center rounded-full px-3 py-1 text-xs font-bold shrink-0"
                                         :class="{
-                                            'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300': unit.status === 'dostupno',
-                                            'bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300': unit.status === 'rezervirano',
-                                            'bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-300': unit.status === 'prodano',
+                                            'bg-ink text-canvas': unit.status === 'dostupno',
+                                            'border border-white/50 text-ink': unit.status === 'rezervirano',
+                                            'bg-white/[0.06] border border-line text-ink-faint': unit.status === 'prodano',
                                         }"
                                         x-text="unit.statusLabel"
                                     ></span>
@@ -103,14 +102,14 @@
                             </template>
                         </div>
 
-                        <p class="text-sm text-stone-500 dark:text-stone-400" x-show="active().units.length === 0">
+                        <p class="text-sm text-ink-soft" x-show="active().units.length === 0">
                             {{ __('Na ovom katu još nema unesenih jedinica.') }}
                         </p>
                     </div>
                 </template>
 
                 <template x-if="!active()">
-                    <p class="text-sm text-stone-500 dark:text-stone-400">
+                    <p class="text-sm text-ink-soft">
                         {{ __('Prijeđi mišem preko kata na slici (ili ga dodirni) da vidiš dostupne jedinice.') }}
                     </p>
                 </template>
@@ -120,8 +119,8 @@
 
     @if ($unassignedUnits->isNotEmpty())
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20">
-            <p class="text-xs font-semibold uppercase tracking-widest text-emerald-800 dark:text-emerald-400 mb-2">{{ __('Samostojeće') }}</p>
-            <h2 class="font-display text-2xl font-semibold mb-8">{{ __('Jedinice') }}</h2>
+            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-ink-faint mb-3">{{ __('Samostojeće') }}</p>
+            <h2 class="font-display text-3xl font-medium text-ink mb-8">{{ __('Jedinice') }}</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach ($unassignedUnits as $unit)
                     <x-unit-card :unit="$unit" />
@@ -255,7 +254,7 @@
                             if (!this.hasShape(floor.points)) continue;
                             const active = floor.id === this.activeId;
                             html += `<polygon points="${this.toSvgPoints(floor.points, this.imgW, this.imgH)}" `
-                                + `class="${active ? 'fill-emerald-500/35 stroke-emerald-400' : 'fill-white/10 stroke-white/70 hover:fill-emerald-500/20'}" `
+                                + `class="${active ? 'fill-white/30 stroke-white' : 'fill-white/[0.06] stroke-white/60 hover:fill-white/20'}" `
                                 + `stroke-width="2"></polygon>`;
                         }
                         return html;
@@ -285,14 +284,14 @@
                         for (const unit of this.unitsWithShape()) {
                             const active = unit.id === this.hoveredUnitId;
                             html += `<polygon points="${this.toSvgPoints(unit.points, this.planW, this.planH)}" `
-                                + `class="${active ? 'fill-emerald-500/35 stroke-emerald-500' : 'fill-white/10 stroke-white/70 hover:fill-emerald-500/20'}" `
+                                + `class="${active ? 'fill-white/30 stroke-white' : 'fill-white/[0.06] stroke-white/60 hover:fill-white/20'}" `
                                 + `stroke-width="2" style="cursor:pointer;"></polygon>`;
 
                             if (active) {
                                 const c = this.toPx(this.centroid(unit.points), this.planW, this.planH);
                                 const label = `${unit.code} · ${unit.statusLabel} · ${unit.area} m²`;
                                 html += `<text x="${c[0]}" y="${c[1]}" text-anchor="middle" class="fill-white text-xs font-semibold pointer-events-none" `
-                                    + `style="paint-order: stroke; stroke: rgba(6,78,59,.85); stroke-width: 3px;">${this.escapeHtml(label)}</text>`;
+                                    + `style="paint-order: stroke; stroke: rgba(0,0,0,.85); stroke-width: 3px;">${this.escapeHtml(label)}</text>`;
                             }
                         }
                         return html;

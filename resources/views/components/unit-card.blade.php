@@ -1,31 +1,33 @@
 @props(['unit'])
 
-<a href="{{ route('public.units.show', $unit) }}" wire:navigate class="group block rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-    <div class="aspect-square bg-stone-100 dark:bg-stone-800 overflow-hidden relative">
+<a href="{{ route('public.units.show', $unit) }}" wire:navigate class="group block rounded-[18px] border border-line bg-canvas-raised overflow-hidden transition duration-300 hover:-translate-y-1.5 hover:border-white/30 hover:shadow-2xl hover:shadow-black/50">
+    <div class="aspect-[4/3] overflow-hidden relative bg-gradient-to-br from-[#1D1D1B] to-canvas mullions-fine">
         @if ($unit->floor_plan_image)
-            <img src="{{ Storage::disk('public')->url($unit->floor_plan_image) }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="{{ $unit->code }}">
+            <img src="{{ Storage::disk('public')->url($unit->floor_plan_image) }}" loading="lazy" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="{{ $unit->code }}">
         @else
-            <div class="w-full h-full flex items-center justify-center text-stone-300 dark:text-stone-700">
+            <div class="absolute inset-0 flex items-center justify-center text-white/15">
                 <x-building-placeholder-icon class="h-10 w-10" />
             </div>
         @endif
 
-        <div class="absolute top-3 right-3">
+        <div class="absolute top-3 left-3">
             <x-unit-status-badge :status="$unit->status" />
         </div>
     </div>
 
     <div class="p-5">
-        <h3 class="font-display font-semibold text-lg leading-snug text-stone-900 dark:text-stone-100">{{ $unit->building->project->name }}</h3>
-        <p class="mt-1 text-sm text-stone-500 dark:text-stone-400">
-            {{ __('Jedinica') }} {{ $unit->code }} &middot; {{ $unit->area_m2 }} m²
-            @if ($unit->room_count) &middot; {{ trans_choice('{1}:count soba|[2,4]:count sobe|[5,*]:count soba', $unit->room_count, ['count' => $unit->room_count]) }} @endif
-        </p>
-
         @if ($unit->price)
-            <p class="mt-3 font-display text-xl font-semibold text-emerald-900 dark:text-emerald-400">
+            <p class="font-display text-xl font-semibold text-ink">
                 {{ number_format((float) $unit->price, 0, ',', '.') }} €
             </p>
+        @else
+            <p class="font-display text-xl font-semibold text-ink">{{ __('Jedinica') }} {{ $unit->code }}</p>
         @endif
+
+        <p class="mt-1.5 text-[12.5px] text-ink-soft">
+            @if ($unit->price){{ __('Jedinica') }} {{ $unit->code }} &middot; @endif{{ $unit->area_m2 }} m²
+            @if ($unit->room_count) &middot; {{ trans_choice('{1}:count soba|[2,4]:count sobe|[5,*]:count soba', $unit->room_count, ['count' => $unit->room_count]) }} @endif
+        </p>
+        <p class="mt-1 text-[11.5px] text-ink-faint">{{ $unit->building->project->name }}</p>
     </div>
 </a>

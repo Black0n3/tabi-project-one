@@ -1,36 +1,40 @@
 <div>
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 sm:pt-16 pb-8">
-        <p class="text-xs font-semibold uppercase tracking-widest text-emerald-800 dark:text-emerald-400 mb-2">{{ __('Pretraga') }}</p>
-        <h1 class="font-display text-3xl sm:text-4xl font-semibold">{{ __('Sve jedinice') }}</h1>
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 sm:pt-16 pb-7">
+        <span class="text-[11px] font-bold uppercase tracking-[0.18em] text-ink-faint">{{ __('Pretraga') }}</span>
+        <h1 class="mt-3.5 font-display text-4xl sm:text-[44px] font-medium leading-tight text-ink">{{ __('Sve jedinice') }}</h1>
     </div>
 
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
-        <div class="rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 shadow-sm p-4 sm:p-5">
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                <x-text-input wire:model.live.debounce.300ms="location" type="search" placeholder="{{ __('Lokacija') }}" />
+    @php
+        $field = 'w-full rounded-xl border-line-strong bg-canvas-raised px-3.5 py-2.5 text-[13.5px] text-ink placeholder:text-ink-faint focus:border-white/40 focus:ring-white/20';
+    @endphp
 
-                <select wire:model.live="projectId" class="border-stone-300 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-300 rounded-md shadow-sm text-sm focus:ring-emerald-600 focus:border-emerald-600">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+        <div class="rounded-[18px] border border-line bg-panel p-4 sm:p-5">
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                <input wire:model.live.debounce.300ms="location" type="search" class="{{ $field }}" placeholder="{{ __('Lokacija') }}" aria-label="{{ __('Lokacija') }}">
+
+                <select wire:model.live="projectId" class="{{ $field }}" aria-label="{{ __('Projekt') }}">
                     <option value="">{{ __('Svi projekti') }}</option>
                     @foreach ($projects as $project)
                         <option value="{{ $project->id }}">{{ $project->name }}</option>
                     @endforeach
                 </select>
 
-                <select wire:model.live="status" class="border-stone-300 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-300 rounded-md shadow-sm text-sm focus:ring-emerald-600 focus:border-emerald-600">
+                <select wire:model.live="status" class="{{ $field }}" aria-label="{{ __('Status') }}">
                     <option value="">{{ __('Svi statusi') }}</option>
                     @foreach ($statuses as $option)
                         <option value="{{ $option->value }}">{{ $option->label() }}</option>
                     @endforeach
                 </select>
 
-                <select wire:model.live="type" class="border-stone-300 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-300 rounded-md shadow-sm text-sm focus:ring-emerald-600 focus:border-emerald-600">
+                <select wire:model.live="type" class="{{ $field }}" aria-label="{{ __('Tip') }}">
                     <option value="">{{ __('Svi tipovi') }}</option>
                     @foreach ($types as $option)
                         <option value="{{ $option->value }}">{{ $option->label() }}</option>
                     @endforeach
                 </select>
 
-                <select wire:model.live="roomCount" class="border-stone-300 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-300 rounded-md shadow-sm text-sm focus:ring-emerald-600 focus:border-emerald-600">
+                <select wire:model.live="roomCount" class="{{ $field }}" aria-label="{{ __('Sobnost') }}">
                     <option value="">{{ __('Sobnost') }}</option>
                     <option value="1">{{ __('1-sobni') }}</option>
                     <option value="2">{{ __('2-sobni') }}</option>
@@ -38,12 +42,12 @@
                     <option value="4+">{{ __('4+ sobni') }}</option>
                 </select>
 
-                <x-text-input wire:model.live.debounce.300ms="minArea" type="number" min="0" placeholder="{{ __('Min m²') }}" />
-                <x-text-input wire:model.live.debounce.300ms="maxArea" type="number" min="0" placeholder="{{ __('Max m²') }}" />
+                <input wire:model.live.debounce.300ms="minArea" type="number" min="0" class="{{ $field }}" placeholder="{{ __('Min m²') }}" aria-label="{{ __('Min m²') }}">
+                <input wire:model.live.debounce.300ms="maxArea" type="number" min="0" class="{{ $field }}" placeholder="{{ __('Max m²') }}" aria-label="{{ __('Max m²') }}">
 
                 <div class="flex gap-2 col-span-2 sm:col-span-1">
-                    <x-text-input wire:model.live.debounce.300ms="minPrice" type="number" min="0" placeholder="{{ __('Min €') }}" />
-                    <x-text-input wire:model.live.debounce.300ms="maxPrice" type="number" min="0" placeholder="{{ __('Max €') }}" />
+                    <input wire:model.live.debounce.300ms="minPrice" type="number" min="0" class="{{ $field }}" placeholder="{{ __('Min €') }}" aria-label="{{ __('Min €') }}">
+                    <input wire:model.live.debounce.300ms="maxPrice" type="number" min="0" class="{{ $field }}" placeholder="{{ __('Max €') }}" aria-label="{{ __('Max €') }}">
                 </div>
             </div>
         </div>
@@ -51,16 +55,18 @@
 
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
         @if ($units->isEmpty())
-            <p class="text-sm text-stone-500 dark:text-stone-400">{{ __('Nema jedinica koje odgovaraju pretrazi.') }}</p>
+            <p class="text-sm text-ink-soft">{{ __('Nema jedinica koje odgovaraju pretrazi.') }}</p>
         @else
+            <p class="mb-6 text-[13px] text-ink-faint">{{ __('Prikazano :from–:to od :total jedinica', ['from' => $units->firstItem(), 'to' => $units->lastItem(), 'total' => $units->total()]) }}</p>
+
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach ($units as $unit)
                     <x-unit-card :unit="$unit" />
                 @endforeach
             </div>
 
-            <div class="mt-8">
-                {{ $units->links() }}
+            <div class="mt-12">
+                {{ $units->links('vendor.pagination.tabi') }}
             </div>
         @endif
     </div>

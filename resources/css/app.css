@@ -1,3 +1,37 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@keyframes tabi-twinkle { 0%, 100% { opacity: .28 } 50% { opacity: 1 } }
+@keyframes tabi-twinkle-soft { 0%, 100% { opacity: .12 } 50% { opacity: .8 } }
+@keyframes tabi-drift { 0%, 100% { transform: translate(0, 0) scale(1.04) } 50% { transform: translate(-16px, -8px) scale(1.04) } }
+@keyframes tabi-float { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(-7px) } }
+@keyframes tabi-pulse-dot { 0%, 100% { opacity: 1 } 50% { opacity: .35 } }
+
+@layer utilities {
+    .anim-twinkle { animation: tabi-twinkle 4.6s ease-in-out infinite; }
+    .anim-twinkle-b { animation: tabi-twinkle-soft 3.7s ease-in-out infinite .8s; }
+    .anim-twinkle-c { animation: tabi-twinkle 5.3s ease-in-out infinite 1.6s; }
+    .anim-drift { animation: tabi-drift 16s ease-in-out infinite; will-change: transform; }
+    .anim-float { animation: tabi-float 4.5s ease-in-out infinite; }
+    .anim-pulse-dot { animation: tabi-pulse-dot 1.8s ease-in-out infinite; }
+
+    .mullions {
+        background-image:
+            repeating-linear-gradient(0deg, rgba(255,255,255,.06) 0 2px, transparent 2px 32px),
+            repeating-linear-gradient(90deg, rgba(255,255,255,.06) 0 2px, transparent 2px 42px);
+    }
+    .mullions-fine {
+        background-image:
+            repeating-linear-gradient(0deg, rgba(255,255,255,.045) 0 2px, transparent 2px 24px),
+            repeating-linear-gradient(90deg, rgba(255,255,255,.045) 0 2px, transparent 2px 30px);
+    }
+    .window-glow {
+        background: #F3E7CE;
+        box-shadow: 0 0 14px 3px rgba(243, 231, 206, .55);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .anim-twinkle, .anim-twinkle-b, .anim-twinkle-c, .anim-drift, .anim-float, .anim-pulse-dot { animation: none; }
+}
