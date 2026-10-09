@@ -5,46 +5,28 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }} — Admin</title>
+        <title>{{ config('app.name', 'Tabi') }} — Admin</title>
 
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800" rel="stylesheet" />
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
+    <body class="font-sans antialiased bg-mist text-ink">
+        <div class="min-h-screen">
             <livewire:layout.admin-navigation />
 
             @if (isset($header))
-                <header class="bg-white dark:bg-gray-800 shadow">
+                <header class="bg-white border-b border-line">
                     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                         {{ $header }}
                     </div>
                 </header>
             @endif
 
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 flex gap-6 py-6">
-                <aside class="hidden md:block w-56 shrink-0">
-                    <nav class="space-y-1">
-                        <a href="{{ route('admin.dashboard') }}" wire:navigate
-                            class="block rounded-md px-3 py-2 text-sm font-medium {{ request()->routeIs('admin.dashboard') ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800' }}">
-                            {{ __('Nadzorna ploča') }}
-                        </a>
-
-                        <div class="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700 space-y-1">
-                            <a href="{{ route('admin.investors.index') }}" wire:navigate
-                                class="block rounded-md px-3 py-2 text-sm font-medium {{ request()->routeIs('admin.investors.*') ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800' }}">
-                                {{ __('Investitori') }}
-                            </a>
-                        </div>
-                    </nav>
-                </aside>
-
-                <main class="flex-1 min-w-0">
-                    {{ $slot }}
-                </main>
-            </div>
+            <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {{ $slot }}
+            </main>
         </div>
 
         @stack('scripts')

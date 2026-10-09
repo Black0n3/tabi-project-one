@@ -20,10 +20,10 @@
     x-init="init()"
 >
     @if (! $image)
-        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $emptyImageMessage }}</p>
+        <p class="text-sm text-ink-soft">{{ $emptyImageMessage }}</p>
     @else
         <div class="flex flex-col lg:flex-row gap-6">
-            <div class="relative inline-block border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-900 max-w-full">
+            <div class="relative inline-block border border-line rounded-lg overflow-hidden bg-mist max-w-full">
                 <img x-ref="image" src="{{ $image }}" @load="onImageLoad" class="block max-w-full h-auto select-none" draggable="false" alt="">
 
                 {{-- Alpine's x-for/x-if templates don't work reliably inside <svg>, so the
@@ -46,36 +46,36 @@
             <div class="w-full lg:w-72 shrink-0 space-y-4">
                 <template x-if="!drawing && !selectedZoneId">
                     <div>
-                        <button type="button" @click="startDrawing()" class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white">
+                        <button type="button" @click="startDrawing()" class="inline-flex items-center px-4 py-2 bg-brand border border-transparent rounded-md font-bold text-sm text-white hover:bg-brand-dark">
                             + {{ __('Nacrtaj novu zonu') }}
                         </button>
 
-                        <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">{{ __('Klikni na postojeću zonu za uređivanje ili brisanje.') }}</p>
+                        <p class="mt-3 text-xs text-ink-soft">{{ __('Klikni na postojeću zonu za uređivanje ili brisanje.') }}</p>
                     </div>
                 </template>
 
                 <template x-if="drawing">
                     <div class="space-y-3">
-                        <p class="text-sm text-gray-700 dark:text-gray-300">
+                        <p class="text-sm text-ink">
                             <span x-show="!drawingClosed">{{ __('Klikni po slici da dodaš točke. Kad završiš, klikni na prvu točku da zatvoriš oblik (min. 3 točke). Točke se same hvataju za rubove i uglove susjednih zona (drži Shift za slobodno postavljanje).') }}</span>
                             <span x-show="drawingClosed">{{ __('Oblik je zatvoren. Odaberi naziv i spremi ili poništi točku za nastavak crtanja.') }}</span>
                             <span x-text="newPoints.length"></span> {{ __('točaka.') }}
                         </p>
 
                         <div class="flex gap-2">
-                            <button type="button" @click="undoPoint()" :disabled="newPoints.length === 0" class="inline-flex items-center px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-500 rounded-md font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest disabled:opacity-25">
+                            <button type="button" @click="undoPoint()" :disabled="newPoints.length === 0" class="inline-flex items-center px-3 py-2 bg-white border border-line-strong rounded-md font-bold text-sm text-ink disabled:opacity-25">
                                 {{ __('Poništi točku') }}
                             </button>
-                            <button type="button" @click="cancelDrawing()" class="inline-flex items-center px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-500 rounded-md font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest">
+                            <button type="button" @click="cancelDrawing()" class="inline-flex items-center px-3 py-2 bg-white border border-line-strong rounded-md font-bold text-sm text-ink">
                                 {{ __('Odustani') }}
                             </button>
                         </div>
 
                         <template x-if="drawingClosed">
-                            <div class="pt-3 border-t border-gray-200 dark:border-gray-700 space-y-3">
+                            <div class="pt-3 border-t border-line space-y-3">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Poveži s postojećim') }}</label>
-                                    <select x-model="attachToId" class="block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm text-sm">
+                                    <label class="block text-sm font-medium text-ink mb-1">{{ __('Poveži s postojećim') }}</label>
+                                    <select x-model="attachToId" class="block w-full border-line-strong rounded-md shadow-sm text-sm">
                                         <option value="">{{ __('— nova stavka —') }}</option>
                                         <template x-for="zone in zones.filter(z => !hasShape(z.points))" :key="'opt-'+zone.id">
                                             <option :value="zone.id" x-text="zone.label"></option>
@@ -84,11 +84,11 @@
                                 </div>
 
                                 <div x-show="attachToId === ''">
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Ili unesi naziv za novu stavku') }}</label>
-                                    <input x-model="newLabel" type="text" placeholder="{{ $newLabelPlaceholder }}" class="block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm text-sm">
+                                    <label class="block text-sm font-medium text-ink mb-1">{{ __('Ili unesi naziv za novu stavku') }}</label>
+                                    <input x-model="newLabel" type="text" placeholder="{{ $newLabelPlaceholder }}" class="block w-full border-line-strong rounded-md shadow-sm text-sm">
                                 </div>
 
-                                <button type="button" @click="save()" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500">
+                                <button type="button" @click="save()" class="inline-flex items-center px-4 py-2 bg-brand border border-transparent rounded-md font-bold text-sm text-white hover:bg-brand-dark">
                                     {{ __('Spremi zonu') }}
                                 </button>
                             </div>
@@ -98,28 +98,28 @@
 
                 <template x-if="selectedZoneId && !drawing">
                     <div class="space-y-3">
-                        <p class="text-sm font-medium text-gray-800 dark:text-gray-200" x-text="selectedZone()?.label"></p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                        <p class="text-sm font-medium text-navy-900" x-text="selectedZone()?.label"></p>
+                        <p class="text-xs text-ink-soft">
                             {{ __('Povuci točku da je pomakneš (hvata se za susjedne zone, Shift za slobodno), klikni na rub oblika da dodaš novu točku, dvoklikni na točku da je ukloniš.') }}
                             <span x-text="editPoints.length"></span> {{ __('točaka.') }}
                         </p>
 
                         <div class="flex flex-wrap gap-2">
-                            <button type="button" @click="saveEdited()" class="inline-flex items-center px-3 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500">
+                            <button type="button" @click="saveEdited()" class="inline-flex items-center px-3 py-2 bg-brand border border-transparent rounded-md font-bold text-sm text-white hover:bg-brand-dark">
                                 {{ __('Spremi promjene') }}
                             </button>
-                            <button type="button" @click="deleteSelected()" class="inline-flex items-center px-3 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500">
+                            <button type="button" @click="deleteSelected()" class="inline-flex items-center px-3 py-2 bg-red-600 border border-transparent rounded-md font-bold text-sm text-white hover:bg-red-500">
                                 {{ __('Obriši zonu') }}
                             </button>
-                            <button type="button" @click="deselect()" class="inline-flex items-center px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-500 rounded-md font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest">
+                            <button type="button" @click="deselect()" class="inline-flex items-center px-3 py-2 bg-white border border-line-strong rounded-md font-bold text-sm text-ink">
                                 {{ __('Zatvori') }}
                             </button>
                         </div>
                     </div>
                 </template>
 
-                <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <p class="text-xs font-semibold uppercase text-gray-400 dark:text-gray-500 mb-2">{{ __('Sve stavke') }}</p>
+                <div class="pt-4 border-t border-line">
+                    <p class="text-xs font-semibold uppercase text-ink-faint mb-2">{{ __('Sve stavke') }}</p>
                     <ul class="space-y-1 text-sm">
                         <template x-for="zone in zones" :key="'list-'+zone.id">
                             <li
@@ -127,12 +127,12 @@
                                 @mouseleave="hoveredZoneId = null"
                                 @click="hasShape(zone.points) && !drawing && !selectedZoneId ? selectZone(zone) : null"
                                 class="flex items-center justify-between gap-2 rounded-md px-2 py-1 -mx-2 transition-colors"
-                                :class="[hasShape(zone.points) ? 'cursor-pointer' : '', zone.id === hoveredZoneId ? 'bg-emerald-50 dark:bg-emerald-900/30' : '']"
+                                :class="[hasShape(zone.points) ? 'cursor-pointer' : '', zone.id === hoveredZoneId ? 'bg-brand-light' : '']"
                             >
-                                <span x-text="zone.label" class="text-gray-700 dark:text-gray-300"></span>
+                                <span x-text="zone.label" class="text-ink"></span>
                                 <span
                                     x-text="hasShape(zone.points) ? '{{ __('označeno') }}' : '{{ __('bez zone') }}'"
-                                    :class="hasShape(zone.points) ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400'"
+                                    :class="hasShape(zone.points) ? 'text-brand' : 'text-ink-faint'"
                                     class="text-xs shrink-0"
                                 ></span>
                             </li>
@@ -225,9 +225,9 @@
                             const c = this.toPx(this.centroid(zone.points));
                             html += `<g>`
                                 + (passive
-                                    ? `<polygon points="${this.toSvgPoints(zone.points)}" class="fill-emerald-500/10 stroke-emerald-600/70" stroke-width="1.5" style="pointer-events:none;"></polygon>`
+                                    ? `<polygon points="${this.toSvgPoints(zone.points)}" class="fill-brand/10 stroke-brand/70" stroke-width="1.5" style="pointer-events:none;"></polygon>`
                                     : `<polygon data-zone-id="${zone.id}" points="${this.toSvgPoints(zone.points)}" `
-                                        + `class="${hovered ? 'fill-emerald-500/45 stroke-emerald-500' : 'fill-emerald-500/25 stroke-emerald-600'}" stroke-width="2" style="cursor:pointer;"></polygon>`)
+                                        + `class="${hovered ? 'fill-brand/45 stroke-brand' : 'fill-brand/25 stroke-brand'}" stroke-width="2" style="cursor:pointer;"></polygon>`)
                                 + `<text x="${c[0]}" y="${c[1]}" text-anchor="middle" class="fill-white text-xs font-semibold pointer-events-none" `
                                 + `style="paint-order: stroke; stroke: rgba(0,0,0,.6); stroke-width: 3px;">${this.escapeHtml(zone.label)}</text>`
                                 + `</g>`;
@@ -239,7 +239,7 @@
                                 if (!this.hasShape(zone.points) || zone.id === this.selectedZoneId) continue;
                                 for (const p of zone.points) {
                                     const px = this.toPx(p);
-                                    html += `<circle cx="${px[0]}" cy="${px[1]}" r="2.5" fill="white" stroke="#059669" stroke-width="1" style="pointer-events:none;"></circle>`;
+                                    html += `<circle cx="${px[0]}" cy="${px[1]}" r="2.5" fill="white" stroke="#0F3F9E" stroke-width="1" style="pointer-events:none;"></circle>`;
                                 }
                             }
                         }
@@ -250,11 +250,11 @@
                         }
 
                         if (this.selectedZoneId && !this.drawing) {
-                            html += `<g><polygon points="${this.toSvgPoints(this.editPoints)}" class="fill-indigo-500/30 stroke-indigo-600" stroke-width="2"></polygon>`;
+                            html += `<g><polygon points="${this.toSvgPoints(this.editPoints)}" class="fill-navy-900/20 stroke-navy-900" stroke-width="2"></polygon>`;
                             this.editPoints.forEach((p, index) => {
                                 const px = this.toPx(p);
                                 html += `<circle data-vertex-index="${index}" cx="${px[0]}" cy="${px[1]}" r="7" `
-                                    + `fill="#4f46e5" stroke="white" stroke-width="1.5" style="cursor:grab;"></circle>`;
+                                    + `fill="#0A1E45" stroke="white" stroke-width="1.5" style="cursor:grab;"></circle>`;
                             });
                             html += `</g>`;
                         }

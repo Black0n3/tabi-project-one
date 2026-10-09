@@ -1,12 +1,12 @@
 <div>
-    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">
+    <p class="text-sm text-ink-soft mb-1">
         <a href="{{ route($routePrefix.'units.show', $unit) }}" wire:navigate class="hover:underline">{{ __('Jedinica') }} {{ $unit->code }}</a>
     </p>
-    <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 mb-6">
+    <h2 class="font-extrabold text-2xl tracking-tight text-navy-900 mb-6">
         {{ $room ? __('Uredi prostoriju') : __('Nova prostorija') }}
     </h2>
 
-    <form wire:submit="save" class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg p-6 space-y-6 max-w-md">
+    <form wire:submit="save" class="bg-white shadow-card rounded-xl border border-line p-6 space-y-6 max-w-md">
         <div>
             <x-input-label for="name" :value="__('Naziv prostorije')" />
             <x-text-input wire:model="name" id="name" class="block mt-1 w-full" type="text" placeholder="npr. Kuhinja" required />

@@ -1,9 +1,9 @@
 <div>
-    <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 mb-6">
+    <h2 class="font-extrabold text-2xl tracking-tight text-navy-900 mb-6">
         {{ $investor ? __('Uredi investitora') : __('Novi investitor') }}
     </h2>
 
-    <form wire:submit="save" class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg p-6 space-y-6 max-w-2xl">
+    <form wire:submit="save" class="bg-white shadow-card rounded-xl border border-line p-6 space-y-6 max-w-2xl">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
                 <x-input-label for="name" :value="__('Ime i prezime kontakt osobe')" />
@@ -24,7 +24,7 @@
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
-        <hr class="border-gray-200 dark:border-gray-700">
+        <hr class="border-line">
 
         <div>
             <x-input-label for="company_name" :value="__('Naziv tvrtke')" />
@@ -54,7 +54,7 @@
 
         <div>
             <x-input-label for="logo" :value="__('Logo')" />
-            <input wire:model="logo" id="logo" type="file" accept="image/*" class="block mt-1 w-full text-sm text-gray-600 dark:text-gray-400" />
+            <input wire:model="logo" id="logo" type="file" accept="image/*" class="block mt-1 w-full text-sm text-ink-soft" />
             <x-input-error :messages="$errors->get('logo')" class="mt-2" />
 
             @if ($logo)

@@ -1,12 +1,12 @@
 <div>
-    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">
+    <p class="text-sm text-ink-soft mb-1">
         <a href="{{ $investorUrl }}" wire:navigate class="hover:underline">{{ $investor->company_name }}</a>
     </p>
-    <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 mb-6">
+    <h2 class="font-extrabold text-2xl tracking-tight text-navy-900 mb-6">
         {{ $project ? __('Uredi projekt') : __('Novi projekt') }}
     </h2>
 
-    <form wire:submit="save" class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg p-6 space-y-6 max-w-2xl">
+    <form wire:submit="save" class="bg-white shadow-card rounded-xl border border-line p-6 space-y-6 max-w-2xl">
         <div>
             <x-input-label for="name" :value="__('Naziv projekta')" />
             <x-text-input wire:model="name" id="name" class="block mt-1 w-full" type="text" required />
@@ -21,7 +21,7 @@
 
         <div>
             <x-input-label for="status" :value="__('Status')" />
-            <select wire:model="status" id="status" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+            <select wire:model="status" id="status" class="block mt-1 w-full border-line-strong rounded-md shadow-sm focus:ring-brand focus:border-brand">
                 @foreach (\App\Enums\ProjectStatus::cases() as $option)
                     <option value="{{ $option->value }}">{{ $option->label() }}</option>
                 @endforeach
@@ -31,13 +31,13 @@
 
         <div>
             <x-input-label for="description" :value="__('Opis')" />
-            <textarea wire:model="description" id="description" rows="4" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+            <textarea wire:model="description" id="description" rows="4" class="block mt-1 w-full border-line-strong rounded-md shadow-sm focus:ring-brand focus:border-brand"></textarea>
             <x-input-error :messages="$errors->get('description')" class="mt-2" />
         </div>
 
         <div>
             <x-input-label for="cover_image" :value="__('Naslovna slika')" />
-            <input wire:model="cover_image" id="cover_image" type="file" accept="image/*" class="block mt-1 w-full text-sm text-gray-600 dark:text-gray-400" />
+            <input wire:model="cover_image" id="cover_image" type="file" accept="image/*" class="block mt-1 w-full text-sm text-ink-soft" />
             <x-input-error :messages="$errors->get('cover_image')" class="mt-2" />
 
             @if ($cover_image)
@@ -48,13 +48,13 @@
         </div>
 
         <label class="flex items-center gap-2">
-            <input wire:model="is_featured" type="checkbox" class="rounded border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500">
-            <span class="text-sm text-gray-700 dark:text-gray-300">{{ __('Istaknuti projekt (prikazuje se na početnoj stranici)') }}</span>
+            <input wire:model="is_featured" type="checkbox" class="rounded border-line-strong text-brand shadow-sm focus:ring-brand">
+            <span class="text-sm text-ink">{{ __('Istaknuti projekt (prikazuje se na početnoj stranici)') }}</span>
         </label>
 
         <label class="flex items-center gap-2">
-            <input wire:model="is_hidden" type="checkbox" class="rounded border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500">
-            <span class="text-sm text-gray-700 dark:text-gray-300">{{ __('Skriveno (projekt se ne prikazuje nigdje na javnom sajtu, ali ostaje vidljiv u ovom panelu)') }}</span>
+            <input wire:model="is_hidden" type="checkbox" class="rounded border-line-strong text-brand shadow-sm focus:ring-brand">
+            <span class="text-sm text-ink">{{ __('Skriveno (projekt se ne prikazuje nigdje na javnom sajtu, ali ostaje vidljiv u ovom panelu)') }}</span>
         </label>
 
         <div class="flex items-center gap-3">
