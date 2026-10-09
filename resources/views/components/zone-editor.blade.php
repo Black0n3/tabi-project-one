@@ -7,7 +7,11 @@
     'emptyImageMessage' => 'Prvo dodaj sliku da bi mogao/la crtati zone.',
 ])
 
+{{-- wire:ignore: all editor state lives client-side (zones are pushed into `zones` after a
+     save). Without it, Livewire's re-render after $wire.call() morphs the DOM and detaches
+     Alpine's x-if templates, so the drawing panel never appears for the next zone. --}}
 <div
+    wire:ignore
     x-data="zoneEditor({
         zones: @js(collect($zones)->map(fn ($z) => ['id' => $z['id'], 'label' => $z['label'], 'points' => $z['points'] ?? []])->values()),
         saveMethod: @js($saveMethod),
@@ -35,7 +39,7 @@
                     @mousedown="onSvgMouseDown($event)"
                     @mousemove="onSvgMouseMove($event)"
                     @mouseup="stopDrag()"
-                    @mouseleave="stopDrag(); hoveredZoneId = null"
+                    @mouseleave="stopDrag(); hoveredZoneId = null; cursorPoint = null; snapTarget = null"
                 ></svg>
             </div>
 
@@ -53,7 +57,8 @@
                 <template x-if="drawing">
                     <div class="space-y-3">
                         <p class="text-sm text-gray-700 dark:text-gray-300">
-                            {{ __('Klikni po slici da dodaš točke (min. 3).') }}
+                            <span x-show="!drawingClosed">{{ __('Klikni po slici da dodaš točke. Kad završiš, klikni na prvu točku da zatvoriš oblik (min. 3 točke). Točke se same hvataju za rubove i uglove susjednih zona (drži Shift za slobodno postavljanje).') }}</span>
+                            <span x-show="drawingClosed">{{ __('Oblik je zatvoren. Odaberi naziv i spremi ili poništi točku za nastavak crtanja.') }}</span>
                             <span x-text="newPoints.length"></span> {{ __('točaka.') }}
                         </p>
 
@@ -66,7 +71,7 @@
                             </button>
                         </div>
 
-                        <template x-if="newPoints.length >= 3">
+                        <template x-if="drawingClosed">
                             <div class="pt-3 border-t border-gray-200 dark:border-gray-700 space-y-3">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('Poveži s postojećim') }}</label>
@@ -95,7 +100,7 @@
                     <div class="space-y-3">
                         <p class="text-sm font-medium text-gray-800 dark:text-gray-200" x-text="selectedZone()?.label"></p>
                         <p class="text-xs text-gray-500 dark:text-gray-400">
-                            {{ __('Povuci točku da je pomakneš, klikni na rub oblika da dodaš novu točku, dvoklikni na točku da je ukloniš.') }}
+                            {{ __('Povuci točku da je pomakneš (hvata se za susjedne zone, Shift za slobodno), klikni na rub oblika da dodaš novu točku, dvoklikni na točku da je ukloniš.') }}
                             <span x-text="editPoints.length"></span> {{ __('točaka.') }}
                         </p>
 
@@ -147,6 +152,9 @@
                     zones: zones.map(z => ({ ...z, points: z.points || [] })),
                     drawing: false,
                     newPoints: [],
+                    drawingClosed: false,
+                    cursorPoint: null,
+                    snapTarget: null,
                     attachToId: '',
                     newLabel: '',
                     selectedZoneId: null,
@@ -204,17 +212,41 @@
                     renderSvg() {
                         let html = '';
 
+                        // While drawing/editing, other zones are only reference geometry:
+                        // they must not capture the pointer (cursor + clicks), otherwise
+                        // wall-to-wall neighbours make it impossible to place a point
+                        // next to them.
+                        const passive = this.drawing || !!this.selectedZoneId;
+
                         for (const zone of this.zones) {
                             if (!this.hasShape(zone.points) || zone.id === this.selectedZoneId) continue;
 
-                            const hovered = zone.id === this.hoveredZoneId;
+                            const hovered = !passive && zone.id === this.hoveredZoneId;
                             const c = this.toPx(this.centroid(zone.points));
                             html += `<g>`
-                                + `<polygon data-zone-id="${zone.id}" points="${this.toSvgPoints(zone.points)}" `
-                                + `class="${hovered ? 'fill-emerald-500/45 stroke-emerald-500' : 'fill-emerald-500/25 stroke-emerald-600'}" stroke-width="2" style="cursor:pointer;"></polygon>`
+                                + (passive
+                                    ? `<polygon points="${this.toSvgPoints(zone.points)}" class="fill-emerald-500/10 stroke-emerald-600/70" stroke-width="1.5" style="pointer-events:none;"></polygon>`
+                                    : `<polygon data-zone-id="${zone.id}" points="${this.toSvgPoints(zone.points)}" `
+                                        + `class="${hovered ? 'fill-emerald-500/45 stroke-emerald-500' : 'fill-emerald-500/25 stroke-emerald-600'}" stroke-width="2" style="cursor:pointer;"></polygon>`)
                                 + `<text x="${c[0]}" y="${c[1]}" text-anchor="middle" class="fill-white text-xs font-semibold pointer-events-none" `
                                 + `style="paint-order: stroke; stroke: rgba(0,0,0,.6); stroke-width: 3px;">${this.escapeHtml(zone.label)}</text>`
                                 + `</g>`;
+                        }
+
+                        // Snap targets: corners of the neighbouring zones.
+                        if (passive) {
+                            for (const zone of this.zones) {
+                                if (!this.hasShape(zone.points) || zone.id === this.selectedZoneId) continue;
+                                for (const p of zone.points) {
+                                    const px = this.toPx(p);
+                                    html += `<circle cx="${px[0]}" cy="${px[1]}" r="2.5" fill="white" stroke="#059669" stroke-width="1" style="pointer-events:none;"></circle>`;
+                                }
+                            }
+                        }
+
+                        if (passive && this.snapTarget) {
+                            const s = this.toPx(this.snapTarget);
+                            html += `<circle cx="${s[0]}" cy="${s[1]}" r="9" fill="none" stroke="#22c55e" stroke-width="2.5" style="pointer-events:none;"></circle>`;
                         }
 
                         if (this.selectedZoneId && !this.drawing) {
@@ -229,18 +261,68 @@
 
                         if (this.drawing) {
                             const canClose = this.newPoints.length >= 3;
-                            const previewPoints = canClose ? [...this.newPoints, this.newPoints[0]] : this.newPoints;
-                            html += `<polyline points="${this.toSvgPoints(previewPoints)}" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4"></polyline>`;
+
+                            if (this.drawingClosed) {
+                                html += `<polygon points="${this.toSvgPoints(this.newPoints)}" fill="rgba(245,158,11,.25)" stroke="#f59e0b" stroke-width="2"></polygon>`;
+                            } else if (this.newPoints.length > 0) {
+                                // Open polyline (+ a rubber-band segment to the cursor);
+                                // the shape only closes when the user clicks the first point.
+                                const open = this.cursorPoint ? [...this.newPoints, this.cursorPoint] : this.newPoints;
+                                html += `<polyline points="${this.toSvgPoints(open)}" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4"></polyline>`;
+                            }
+
                             this.newPoints.forEach((p, index) => {
                                 const px = this.toPx(p);
-                                const isStart = canClose && index === 0;
+                                const isStart = canClose && !this.drawingClosed && index === 0;
                                 html += isStart
-                                    ? `<circle cx="${px[0]}" cy="${px[1]}" r="8" fill="#f59e0b" stroke="white" stroke-width="2" style="cursor:pointer;"></circle>`
+                                    ? `<circle cx="${px[0]}" cy="${px[1]}" r="9" fill="#f59e0b" stroke="white" stroke-width="2" style="cursor:pointer;"></circle>`
                                     : `<circle cx="${px[0]}" cy="${px[1]}" r="4" fill="#f59e0b"></circle>`;
                             });
                         }
 
                         return html;
+                    },
+
+                    // Snaps a point (in %) to the nearest corner of any other zone, or failing
+                    // that to the nearest spot on another zone's edge, so wall-to-wall
+                    // apartments can share exact boundaries. Tolerances are in screen px.
+                    snapPoint(point, excludeZoneId = null, vertexTol = 12, edgeTol = 8) {
+                        let bestVertex = null;
+                        let bestVertexDist = vertexTol;
+                        let bestEdge = null;
+                        let bestEdgeDist = edgeTol;
+                        const p = this.toPx(point);
+
+                        for (const zone of this.zones) {
+                            if (!this.hasShape(zone.points) || zone.id === excludeZoneId) continue;
+
+                            for (let i = 0; i < zone.points.length; i++) {
+                                const a = this.toPx(zone.points[i]);
+                                const b = this.toPx(zone.points[(i + 1) % zone.points.length]);
+
+                                const vd = Math.hypot(p[0] - a[0], p[1] - a[1]);
+                                if (vd < bestVertexDist) {
+                                    bestVertexDist = vd;
+                                    bestVertex = zone.points[i];
+                                }
+
+                                const dx = b[0] - a[0], dy = b[1] - a[1];
+                                const lenSq = dx * dx + dy * dy;
+                                const t = lenSq === 0 ? 0 : Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / lenSq));
+                                const q = [a[0] + t * dx, a[1] + t * dy];
+                                const ed = Math.hypot(p[0] - q[0], p[1] - q[1]);
+                                if (ed < bestEdgeDist) {
+                                    bestEdgeDist = ed;
+                                    bestEdge = [
+                                        Math.round((q[0] / this.imgW) * 10000) / 100,
+                                        Math.round((q[1] / this.imgH) * 10000) / 100,
+                                    ];
+                                }
+                            }
+                        }
+
+                        const target = bestVertex ? [...bestVertex] : bestEdge;
+                        return target ? { point: target, snapped: true } : { point, snapped: false };
                     },
 
                     posFromEvent(e) {
@@ -255,6 +337,8 @@
                     startDrawing() {
                         this.drawing = true;
                         this.newPoints = [];
+                        this.drawingClosed = false;
+                        this.cursorPoint = null;
                         this.attachToId = '';
                         this.newLabel = '';
                         this.selectedZoneId = null;
@@ -263,9 +347,13 @@
                     cancelDrawing() {
                         this.drawing = false;
                         this.newPoints = [];
+                        this.drawingClosed = false;
+                        this.cursorPoint = null;
                     },
 
                     undoPoint() {
+                        // Undoing on a closed shape re-opens it so drawing can continue.
+                        this.drawingClosed = false;
                         this.newPoints.pop();
                     },
 
@@ -281,16 +369,21 @@
                         }
 
                         if (this.drawing) {
+                            if (this.drawingClosed) return;
+
                             const point = this.posFromEvent(e);
 
-                            // Clicking back near the starting point closes the shape
-                            // instead of adding a stray extra vertex there -- the
-                            // closing edge is already drawn in the preview and on save.
+                            // The shape stays open until the user clicks back on the
+                            // first point (needs >= 3 points) -- that is the only thing
+                            // that closes it, so any number of points can be drawn.
                             if (this.newPoints.length >= 3 && this.isNearPoint(point, this.newPoints[0])) {
+                                this.drawingClosed = true;
+                                this.cursorPoint = null;
                                 return;
                             }
 
-                            this.newPoints.push(point);
+                            const snap = e.shiftKey ? { point } : this.snapPoint(point);
+                            this.newPoints.push(snap.point);
                             return;
                         }
 
@@ -374,7 +467,21 @@
                             return;
                         }
 
-                        if (this.drawing || this.selectedZoneId) return;
+                        if (this.drawing) {
+                            if (this.drawingClosed) {
+                                this.cursorPoint = null;
+                                this.snapTarget = null;
+                                return;
+                            }
+
+                            const raw = this.posFromEvent(e);
+                            const snap = e.shiftKey ? { point: raw, snapped: false } : this.snapPoint(raw);
+                            this.snapTarget = snap.snapped ? snap.point : null;
+                            this.cursorPoint = this.newPoints.length === 0 ? null : snap.point;
+                            return;
+                        }
+
+                        if (this.selectedZoneId) return;
 
                         const zoneEl = e.target.closest('[data-zone-id]');
                         this.hoveredZoneId = zoneEl ? parseInt(zoneEl.dataset.zoneId) : null;
@@ -389,7 +496,7 @@
                     },
 
                     async save() {
-                        if (this.newPoints.length < 3) return;
+                        if (this.newPoints.length < 3 || !this.drawingClosed) return;
                         const targetId = this.attachToId ? parseInt(this.attachToId) : null;
                         if (!targetId && !this.newLabel.trim()) return;
 
@@ -406,6 +513,8 @@
 
                         this.drawing = false;
                         this.newPoints = [];
+                        this.drawingClosed = false;
+                        this.cursorPoint = null;
                     },
 
                     selectZone(zone) {
@@ -428,11 +537,15 @@
                     onDrag(e) {
                         if (this.draggingIndex === null) return;
                         this.didDrag = true;
-                        this.editPoints[this.draggingIndex] = this.posFromEvent(e);
+                        const raw = this.posFromEvent(e);
+                        const snap = e.shiftKey ? { point: raw, snapped: false } : this.snapPoint(raw, this.selectedZoneId);
+                        this.snapTarget = snap.snapped ? snap.point : null;
+                        this.editPoints[this.draggingIndex] = snap.point;
                     },
 
                     stopDrag() {
                         this.draggingIndex = null;
+                        this.snapTarget = null;
                     },
 
                     async saveEdited() {
