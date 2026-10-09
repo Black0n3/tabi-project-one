@@ -44,7 +44,7 @@ npm run build
 
 say "Packing working tree + build output"
 tar -czf /tmp/p1-src.tar.gz \
-  --exclude='./.git' --exclude='./.claude' --exclude='./vendor' --exclude='./node_modules' --exclude='./public/build' \
+  --exclude='./.git' --exclude='./.claude' --exclude='./vendor' --exclude='./node_modules' --exclude='./public/build' --exclude='./public/storage' --exclude='./public/hot' \
   --exclude='./database/*.sqlite' \
   --exclude='./.env' --exclude='./storage/framework/views/*.php' \
   --exclude='./storage/logs/*' --exclude='./.phpunit.result.cache' \
@@ -77,13 +77,13 @@ tar -xzf /tmp/p1-build.tar.gz -C "$APP_DIR/public/"
 
 chown -R "$SITE_USER:$SITE_USER" "$APP_DIR"
 
-[ -L "$WEB_DIR/storage" ] || ln -sfn "$APP_DIR/storage/app/public" "$WEB_DIR/storage"
-chown -h "$SITE_USER:$SITE_USER" "$WEB_DIR/storage"
+ln -sfn "$APP_DIR/storage/app/public" "$WEB_DIR/storage"
+ln -sfn "$APP_DIR/storage/app/public" "$APP_DIR/public/storage"
+chown -h "$SITE_USER:$SITE_USER" "$WEB_DIR/storage" "$APP_DIR/public/storage"
 
 mkdir -p "$APP_DIR/tmp" && chown "$SITE_USER:$SITE_USER" "$APP_DIR/tmp"
 cd "$APP_DIR"
 run() { sudo -u "$SITE_USER" env TMPDIR="$APP_DIR/tmp" php artisan "$@"; }
-[ -L "$APP_DIR/public/storage" ] || run storage:link
 composer_bin() { sudo -u "$SITE_USER" env TMPDIR="$APP_DIR/tmp" COMPOSER_HOME="$APP_DIR/tmp" composer "$@"; }
 composer_bin install --optimize-autoloader --no-interaction
 run migrate --force
