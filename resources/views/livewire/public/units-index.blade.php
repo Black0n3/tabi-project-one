@@ -1,15 +1,19 @@
 <div>
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 sm:pt-16 pb-7">
-        <span class="text-[11px] font-bold uppercase tracking-[0.18em] text-ink-faint">{{ __('Pretraga') }}</span>
-        <h1 class="mt-3.5 font-display text-4xl sm:text-[44px] font-medium leading-tight text-ink">{{ __('Sve jedinice') }}</h1>
-    </div>
+    <section class="relative overflow-hidden bg-navy-950">
+        <x-hero-backdrop compact />
+        <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-28 sm:pt-14 text-white">
+            <p class="text-xs font-bold uppercase tracking-[0.16em] text-brand-sky">{{ __('Pretraga') }}</p>
+            <h1 class="mt-2 text-4xl sm:text-5xl font-extrabold tracking-tight">{{ __('Sve jedinice') }}</h1>
+            <p class="mt-3 max-w-lg text-[15.5px] text-white/75">{{ __('Filtrirajte po lokaciji, sobnosti, kvadraturi i cijeni.') }}</p>
+        </div>
+    </section>
 
     @php
-        $field = 'w-full rounded-xl border-line-strong bg-canvas-raised px-3.5 py-2.5 text-[13.5px] text-ink placeholder:text-ink-faint focus:border-white/40 focus:ring-white/20';
+        $field = 'w-full rounded-md border-line-strong px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-faint focus:border-brand focus:ring-brand';
     @endphp
 
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
-        <div class="rounded-[18px] border border-line bg-panel p-4 sm:p-5">
+    <div class="relative z-10 -mt-16 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="rounded-xl border border-line bg-white p-4 shadow-lift sm:p-5">
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                 <input wire:model.live.debounce.300ms="location" type="search" class="{{ $field }}" placeholder="{{ __('Lokacija') }}" aria-label="{{ __('Lokacija') }}">
 
@@ -53,11 +57,11 @@
         </div>
     </div>
 
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
         @if ($units->isEmpty())
             <p class="text-sm text-ink-soft">{{ __('Nema jedinica koje odgovaraju pretrazi.') }}</p>
         @else
-            <p class="mb-6 text-[13px] text-ink-faint">{{ __('Prikazano :from–:to od :total jedinica', ['from' => $units->firstItem(), 'to' => $units->lastItem(), 'total' => $units->total()]) }}</p>
+            <p class="mb-6 text-sm font-semibold text-ink-soft">{{ __('Prikazano :from–:to od :total jedinica', ['from' => $units->firstItem(), 'to' => $units->lastItem(), 'total' => $units->total()]) }}</p>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach ($units as $unit)

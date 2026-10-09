@@ -1,24 +1,27 @@
 <div>
     <x-page-hero :image="$facadeUrl">
-        <p class="text-[13px] font-semibold text-ink-soft">
-            <a href="{{ route('public.projects.show', $building->project) }}" wire:navigate class="transition hover:text-ink">{{ $building->project->name }}</a>
+        <p class="text-sm font-semibold text-brand-sky">
+            <a href="{{ route('public.projects.show', $building->project) }}" wire:navigate class="transition hover:text-white">{{ $building->project->name }}</a>
         </p>
-        <h1 class="mt-3.5 font-display text-4xl sm:text-[46px] font-medium leading-tight text-ink">{{ $building->name }}</h1>
-        <p class="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-ink-soft">
-            <span class="inline-flex items-center rounded-full border border-line-strong bg-white/[0.08] px-3.5 py-1.5 text-[12.5px] font-semibold text-ink">{{ $building->type->label() }}</span>
+        <h1 class="mt-2.5 text-4xl sm:text-5xl font-extrabold leading-tight tracking-tight">{{ $building->name }}</h1>
+        <p class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-white/80">
+            <span class="inline-flex items-center rounded bg-brand px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white">{{ $building->type->label() }}</span>
             @if ($building->address)
-                <span>{{ $building->address }}</span>
+                <span class="inline-flex items-center gap-1.5">
+                    <svg viewBox="0 0 20 20" fill="none" class="h-4 w-4"><path d="M10 18s6-5.2 6-9.6A6 6 0 004 8.4C4 12.8 10 18 10 18z" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="8.2" r="2" stroke="currentColor" stroke-width="1.5"/></svg>
+                    {{ $building->address }}
+                </span>
             @endif
         </p>
     </x-page-hero>
 
     <div
-        class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16"
+        class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-14"
         x-data="buildingViewer({ floors: @js($floorsData), hasFacade: @js((bool) $facadeUrl) })"
         x-init="init()"
     >
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-            <div class="relative inline-block rounded-[22px] border border-line-strong shadow-2xl shadow-black/50 overflow-hidden bg-canvas-raised w-full">
+            <div class="relative inline-block w-full overflow-hidden rounded-xl border border-line bg-mist shadow-card">
                 {{-- Fasada (bira kat hoverom) -- sakriva se čim aktivni kat ima svoj tlocrt --}}
                 <template x-if="hasFacade">
                     <div x-show="!showPlan()">
@@ -29,14 +32,14 @@
                             class="absolute inset-0 w-full h-full"
                             @mousemove="onMove($event)"
                             @click="onClick($event)"
-                            style="cursor: pointer; filter: drop-shadow(0 0 1px rgba(0,0,0,.85));"
+                            style="cursor: pointer; filter: drop-shadow(0 0 1px rgba(0,0,0,.6));"
                         ></svg>
                     </div>
                 </template>
 
                 {{-- Tlocrt aktivnog kata (bira jedinicu hoverom) -- umjesto fasade dok god kat ima svoj tlocrt --}}
                 <template x-if="showPlan()">
-                    <div>
+                    <div class="bg-white">
                         <img x-ref="planImage" :src="active().planUrl" @load="updatePlanRect" class="block w-full h-auto select-none" draggable="false" :alt="active().label">
                         <svg
                             x-ref="planSvg"
@@ -45,15 +48,15 @@
                             @mousemove="onPlanMove($event)"
                             @mouseleave="hoveredUnitId = null"
                             @click="onPlanClick($event)"
-                            style="cursor: pointer; filter: drop-shadow(0 0 1px rgba(0,0,0,.85));"
+                            style="cursor: pointer;"
                         ></svg>
                     </div>
                 </template>
 
                 <template x-if="!hasFacade && !showPlan()">
-                    <div class="aspect-[4/3] flex flex-col items-center justify-center gap-3 text-ink-faint text-sm p-8 text-center">
-                        <x-building-placeholder-icon class="h-10 w-10" />
-                        {{ __('Fasada objekta još nije dodana.') }}
+                    <div class="aspect-[4/3] flex flex-col items-center justify-center gap-3 text-slate-300 text-sm p-8 text-center bg-slate-100">
+                        <x-building-placeholder-icon class="h-12 w-12" />
+                        <span class="text-ink-soft">{{ __('Fasada objekta još nije dodana.') }}</span>
                     </div>
                 </template>
             </div>
@@ -66,8 +69,8 @@
                                 type="button"
                                 @mouseenter="select(floor.id)"
                                 @click="select(floor.id)"
-                                :class="floor.id === activeId ? 'bg-ink text-canvas font-bold' : 'bg-panel text-ink-soft hover:bg-white/10 font-semibold'"
-                                class="px-[18px] py-2 rounded-full text-[13.5px] transition"
+                                :class="floor.id === activeId ? 'bg-brand text-white border-brand' : 'bg-white text-ink border-line-strong hover:border-brand hover:text-brand'"
+                                class="px-4 py-2 rounded-md border text-[13.5px] font-bold transition"
                                 x-text="floor.label"
                             ></button>
                         </template>
@@ -76,25 +79,25 @@
 
                 <template x-if="active()">
                     <div>
-                        <h2 class="font-display font-semibold text-[22px] mb-4 text-ink" x-text="active().label"></h2>
+                        <h2 class="mb-4 text-2xl font-extrabold tracking-tight text-navy-900" x-text="active().label"></h2>
 
-                        <p class="text-xs text-ink-faint mb-4" x-show="showPlan() && unitsWithShape().length > 0">
+                        <p class="mb-4 text-xs text-ink-faint" x-show="showPlan() && unitsWithShape().length > 0">
                             {{ __('Prijeđi mišem preko stana na tlocrtu (ili ga dodirni) za detalje.') }}
                         </p>
 
                         <div class="space-y-2.5" x-show="active().units.length > 0">
                             <template x-for="unit in active().units" :key="unit.id">
-                                <a :href="unit.url" wire:navigate class="flex items-center justify-between gap-3 rounded-2xl border border-line bg-canvas-raised px-5 py-4 transition hover:-translate-y-0.5 hover:border-white/30">
+                                <a :href="unit.url" wire:navigate class="flex items-center justify-between gap-3 rounded-lg border border-line bg-white px-5 py-4 shadow-card transition hover:-translate-y-0.5 hover:border-brand/50 hover:shadow-lift">
                                     <div>
-                                        <span class="font-display font-semibold text-base text-ink" x-text="unit.code"></span>
-                                        <span class="text-[13px] text-ink-faint" x-text="' · ' + unit.area + ' m²'"></span>
+                                        <span class="text-base font-extrabold text-navy-900" x-text="unit.code"></span>
+                                        <span class="text-[13px] text-ink-soft" x-text="' · ' + unit.area + ' m²'"></span>
                                     </div>
                                     <span
-                                        class="inline-flex items-center rounded-full px-3 py-1 text-xs font-bold shrink-0"
+                                        class="inline-flex items-center rounded px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide shrink-0"
                                         :class="{
-                                            'bg-ink text-canvas': unit.status === 'dostupno',
-                                            'border border-white/50 text-ink': unit.status === 'rezervirano',
-                                            'bg-white/[0.06] border border-line text-ink-faint': unit.status === 'prodano',
+                                            'bg-emerald-600 text-white': unit.status === 'dostupno',
+                                            'bg-amber-500 text-navy-950': unit.status === 'rezervirano',
+                                            'bg-slate-500 text-white': unit.status === 'prodano',
                                         }"
                                         x-text="unit.statusLabel"
                                     ></span>
@@ -119,8 +122,8 @@
 
     @if ($unassignedUnits->isNotEmpty())
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20">
-            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-ink-faint mb-3">{{ __('Samostojeće') }}</p>
-            <h2 class="font-display text-3xl font-medium text-ink mb-8">{{ __('Jedinice') }}</h2>
+            <p class="text-xs font-bold uppercase tracking-[0.16em] text-brand mb-2">{{ __('Samostojeće') }}</p>
+            <h2 class="mb-8 text-3xl font-extrabold tracking-tight text-navy-900">{{ __('Jedinice') }}</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach ($unassignedUnits as $unit)
                     <x-unit-card :unit="$unit" />
@@ -254,7 +257,7 @@
                             if (!this.hasShape(floor.points)) continue;
                             const active = floor.id === this.activeId;
                             html += `<polygon points="${this.toSvgPoints(floor.points, this.imgW, this.imgH)}" `
-                                + `class="${active ? 'fill-white/30 stroke-white' : 'fill-white/[0.06] stroke-white/60 hover:fill-white/20'}" `
+                                + `class="${active ? 'fill-brand/40 stroke-white' : 'fill-white/10 stroke-white/80 hover:fill-white/25'}" `
                                 + `stroke-width="2"></polygon>`;
                         }
                         return html;
@@ -284,14 +287,14 @@
                         for (const unit of this.unitsWithShape()) {
                             const active = unit.id === this.hoveredUnitId;
                             html += `<polygon points="${this.toSvgPoints(unit.points, this.planW, this.planH)}" `
-                                + `class="${active ? 'fill-white/30 stroke-white' : 'fill-white/[0.06] stroke-white/60 hover:fill-white/20'}" `
+                                + `class="${active ? 'fill-brand/30 stroke-brand' : 'fill-navy-900/5 stroke-navy-900/40 hover:fill-brand/15'}" `
                                 + `stroke-width="2" style="cursor:pointer;"></polygon>`;
 
                             if (active) {
                                 const c = this.toPx(this.centroid(unit.points), this.planW, this.planH);
                                 const label = `${unit.code} · ${unit.statusLabel} · ${unit.area} m²`;
                                 html += `<text x="${c[0]}" y="${c[1]}" text-anchor="middle" class="fill-white text-xs font-semibold pointer-events-none" `
-                                    + `style="paint-order: stroke; stroke: rgba(0,0,0,.85); stroke-width: 3px;">${this.escapeHtml(label)}</text>`;
+                                    + `style="paint-order: stroke; stroke: rgba(10,30,69,.9); stroke-width: 3px;">${this.escapeHtml(label)}</text>`;
                             }
                         }
                         return html;
